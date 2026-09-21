@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OJH — Play Mode Concept</title>
+<meta name="description" content="Three.js 히어로 시안: 디오라마 큐브 + Edit→Play 전환 + Debug 오버레이">
+<style>
+:root{color-scheme:dark;--bg:#04080d;--text:#f0f3fa;--muted:#a6b1c7;--soft:#75829a;--line:#242d3c;--accent:#b5b5f5;--blue:#94bcf6;--pad:clamp(20px,3vw,60px);--font:Inter,"Segoe UI","Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible{outline:2px solid #c4ceff;outline-offset:4px;border-radius:8px}
+
+.site-header{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--pad);position:relative;z-index:20}
+.brand{display:flex;align-items:center;gap:14px;white-space:nowrap}
+.brand>span:first-child{font-size:22px;font-weight:500;letter-spacing:1px}
+.brand-dot{width:5px;height:5px;background:#bbbef3;border-radius:50%;box-shadow:0 0 14px #889ff599}
+.brand-line{font-size:11px;color:var(--muted)}
+.nav{display:flex;gap:28px;font-size:12px;color:#b6bfd2}
+.nav span:first-child{color:#fff}
+
+.hero{position:relative;height:calc(100dvh - 76px);min-height:560px;isolation:isolate;overflow:hidden}
+#stage{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
+.hero-copy{position:absolute;top:12%;left:var(--pad);width:min(40%,520px);z-index:5;pointer-events:none}
+.hero-copy a,.hero-copy button{pointer-events:auto}.hero-copy{transition:opacity .4s,transform .5s}.hero-copy.dim{opacity:0;transform:translateX(-24px);pointer-events:none}.hero-copy.dim *{pointer-events:none}
+.eyebrow{font-size:10px;letter-spacing:.22em;font-weight:500;color:#a7b9d4;margin:0}
+.hero h1{font-size:clamp(34px,3.5vw,64px);font-weight:550;letter-spacing:-.045em;line-height:1.14;margin:16px 0 0}
+.hero h1 span{color:#c2bef6}
+.hero-desc{font-size:clamp(13px,1vw,16px);line-height:1.9;color:#b6c2d8;margin:22px 0 0;max-width:420px}
+.hero-actions{display:flex;gap:12px;margin-top:26px}
+.button{display:inline-flex;align-items:center;gap:14px;padding:0 22px;min-height:42px;border-radius:30px;font-size:12px;font-weight:550;transition:transform .2s,background .2s;white-space:nowrap}
+.button:hover{transform:translateY(-2px)}
+.button-primary{background:#f1f3fd;color:#080d19;border:1px solid #dce7ff}
+.button-ghost{border:1px solid #6a778d;font-weight:400}
+.button-ghost:hover{background:#141d2a}
+
+/* Unity-style toolbar */
+.toolbar{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:6px;padding:6px;border:1px solid #2b3446;background:#0c111acc;backdrop-filter:blur(10px);border-radius:12px}
+.tb{width:38px;height:32px;display:grid;place-items:center;border-radius:8px;color:#c8d2e6;transition:background .15s,color .15s}
+.tb:hover{background:#1a2230;color:#fff}
+.tb[aria-pressed=true]{background:#2c5aa8;color:#fff;box-shadow:inset 0 0 0 1px #6b9cf0}
+.tb svg{width:14px;height:14px;fill:currentColor}
+.tb-sep{width:1px;height:20px;background:#2b3446;margin:0 4px}
+.tb-label{font-size:10px;letter-spacing:.14em;color:#8e9cb5;padding:0 10px 0 6px;min-width:64px;text-align:center}
+.tb-label b{font-weight:600;color:#e9eefb}
+
+/* HUD */
+.hud{position:absolute;left:var(--pad);bottom:28px;z-index:6;font-size:10px;letter-spacing:.14em;color:#9aabc3;display:flex;align-items:center;gap:14px}
+.hud kbd{font:inherit;padding:3px 7px;border:1px solid #3a475c;border-radius:5px;color:#dbe3f2}
+.debug{position:absolute;right:var(--pad);bottom:28px;z-index:6;display:none;min-width:190px;padding:12px 14px;border:1px solid #2b3446;background:#0a0f18d9;backdrop-filter:blur(8px);border-radius:10px;font:11px/1.8 ui-monospace,Menlo,Consolas,monospace;color:#b9c6dc}
+.debug.on{display:block}
+.debug b{color:#8fe0ff;font-weight:500}
+.debug .row{display:flex;justify-content:space-between;gap:16px}
+.debug .head{font-size:9px;letter-spacing:.18em;color:#6f7d95;margin-bottom:4px}
+
+/* hover label */
+.tip{position:absolute;z-index:7;pointer-events:none;transform:translate(-50%,-100%);opacity:0;transition:opacity .15s;text-align:center;filter:drop-shadow(0 2px 8px #000)}
+.tip.on{opacity:1}
+.tip strong{display:block;font-size:13px;font-weight:650;letter-spacing:.02em}
+.tip span{display:block;font-size:10px;letter-spacing:.12em;color:#9fb2cc;margin-top:4px}
+
+/* detail panel */
+.detail{position:absolute;z-index:12;top:50%;right:var(--pad);transform:translate(24px,-50%);width:min(380px,calc(100% - 2*var(--pad)));padding:26px 26px 22px;border:1px solid #3a4760;border-radius:18px;background:#0b111bf5;backdrop-filter:blur(16px);box-shadow:0 30px 120px #000c;opacity:0;pointer-events:none;transition:opacity .3s,transform .35s cubic-bezier(.2,.7,.2,1)}
+.detail.on{opacity:1;pointer-events:auto;transform:translate(0,-50%)}
+.detail .index{font-size:9px;letter-spacing:.16em;color:#8e9cb3}
+.detail h2{font-size:28px;letter-spacing:-.03em;font-weight:500;margin:8px 0 0}
+.detail p{font-size:13px;line-height:1.85;color:#b7c5dc;margin:14px 0 0;word-break:keep-all}
+.detail ul{margin:14px 0 0;padding-left:16px;font-size:12px;line-height:1.9;color:#b6c3da}
+.detail .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:16px}
+.detail .tags span{font-size:9px;padding:3px 8px;border:1px solid #3a475d;border-radius:20px;color:#c9d3e5}
+.detail .actions{display:flex;gap:10px;margin-top:22px;align-items:center}
+.detail .close{position:absolute;right:14px;top:14px;width:32px;height:32px;border-radius:50%;border:1px solid #717f9366;display:grid;place-items:center;font-size:16px;color:#c8d2e6}
+.detail .close:hover{background:#1a2230}
+
+.gizmo-note{position:absolute;top:18px;right:var(--pad);z-index:6;font-size:9px;letter-spacing:.16em;color:#6f7d95;text-align:right;line-height:1.7;display:flex;flex-direction:column;align-items:flex-end;gap:6px}#gizmo{width:84px;height:84px;display:block}
+
+@media (max-width:900px){
+  .brand-line{display:none}
+  .hero{height:auto;min-height:0;display:flex;flex-direction:column}
+  #stage{position:relative;height:62vw;min-height:380px;order:0}
+  .toolbar{position:relative;top:auto;left:auto;transform:none;order:1;align-self:center;margin-top:-24px}
+  .hero-copy{position:static;width:auto;padding:24px var(--pad) 8px;order:2}
+  .hero-copy.dim{opacity:1;transform:none;pointer-events:auto}
+  .hud,.gizmo-note{display:none}
+  .debug{bottom:auto;top:14px;right:14px;min-width:150px}
+  .detail{right:50%;top:auto;bottom:70px;transform:translate(50%,24px)}
+  .detail.on{transform:translate(50%,0)}
+  .nav{display:none}
+}
+@media (prefers-reduced-motion:reduce){.button:hover{transform:none}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="brand"><span>OHJH</span><span class="brand-dot"></span><span class="brand-line">UNITY × INTERACTIVE DEVELOPER</span></div>
+  <nav class="nav" aria-label="시안 메뉴"><span>Home</span><span>Projects</span><span>About</span><span>Skills</span><span>Contact</span></nav>
+  <a class="button button-ghost" href="mailto:popmin07@gmail.com" style="min-height:36px">Let's Talk</a>
+</header>
+
+<section class="hero" aria-label="인터랙티브 씬">
+  <canvas id="stage" aria-label="프로젝트 디오라마 큐브 다섯 개가 떠 있는 3D 씬"></canvas>
+
+  <div class="hero-copy">
+    <p class="eyebrow">SCENE 01 · PRESS PLAY</p>
+    <h1>Ideas into<br><span>Real Experiences.</span></h1>
+    <p class="hero-desc">Unity와 AI로 아이디어를 실제로 만지고 움직이는 경험으로 만드는 개발자, 오정훈입니다. 위의 ▶ 버튼을 누르면 씬이 실행됩니다.</p>
+    <div class="hero-actions">
+      <button class="button button-primary" id="cta-play" type="button">Play Scene <span aria-hidden="true">▶</span></button>
+      <a class="button button-ghost" href="#projects">Explore Work</a>
+    </div>
+  </div>
+
+  <div class="toolbar" role="group" aria-label="씬 제어">
+    <button class="tb" id="btn-play" type="button" aria-pressed="false" aria-label="플레이" title="Play (Space)">
+      <svg viewBox="0 0 16 16"><path d="M3 2l11 6-11 6z"/></svg>
+    </button>
+    <button class="tb" id="btn-pause" type="button" aria-pressed="false" aria-label="일시정지" title="Pause">
+      <svg viewBox="0 0 16 16"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg>
+    </button>
+    <button class="tb" id="btn-step" type="button" aria-label="한 프레임 진행" title="Step">
+      <svg viewBox="0 0 16 16"><path d="M3 2l8 6-8 6zM12 2h2v12h-2z"/></svg>
+    </button>
+    <span class="tb-sep"></span>
+    <span class="tb-label" id="mode-label">MODE <b>EDIT</b></span>
+    <span class="tb-sep"></span>
+    <button class="tb" id="btn-debug" type="button" aria-pressed="false" aria-label="디버그 오버레이" title="Debug (D)" style="width:auto;padding:0 12px;font-size:10px;letter-spacing:.12em">DEBUG</button>
+  </div>
+
+  <div class="gizmo-note"><canvas id="gizmo" width="84" height="84" aria-hidden="true"></canvas>SCENE VIEW<br>DRAG · HOVER · CLICK</div>
+  <div class="hud"><kbd>Space</kbd> Play / Pause <kbd>D</kbd> Debug <kbd>Esc</kbd> Back</div>
+
+  <div class="debug" id="debug" aria-live="polite">
+    <div class="head">RUNTIME STATS</div>
+    <div class="row"><span>FPS</span><b id="s-fps">—</b></div>
+    <div class="row"><span>Frame</span><b id="s-ms">—</b></div>
+    <div class="row"><span>Draw calls</span><b id="s-calls">—</b></div>
+    <div class="row"><span>Triangles</span><b id="s-tris">—</b></div>
+    <div class="row"><span>Instances (fish)</span><b id="s-fish">—</b></div>
+    <div class="row"><span>DPR</span><b id="s-dpr">—</b></div>
+  </div>
+
+  <div class="tip" id="tip"><strong></strong><span></span></div>
+
+  <aside class="detail" id="detail" aria-hidden="true">
+    <button class="close" id="detail-close" type="button" aria-label="닫기">×</button>
+    <div class="index" id="d-index"></div>
+    <h2 id="d-title"></h2>
+    <p id="d-desc"></p>
+    <ul id="d-points"></ul>
+    <div class="tags" id="d-tags"></div>
+    <div class="actions">
+      <a class="button button-primary" id="d-notion" target="_blank" rel="noopener noreferrer" style="min-height:38px">개발 문서 ↗</a>
+      <span style="font-size:9px;color:#95a4bc">Notion · 게시 주소로 교체 예정</span>
+    </div>
+  </aside>
+</section>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+/* ---------- data ---------- */
+const PROJECTS = [
+  { id:'still', index:'01', title:'STILL', field:'UNITY · VR · AI', tone:0x5aa9ff, tags:['Unity','Gemini','Quest 2'],
+    desc:'가상 아쿠아리움 속에서 해양생물을 만나고 탐색하는 VR 도감. 보이드 군집 시뮬레이션과 Gemini 해설, 한국어 TTS를 연결했습니다.',
+    points:['균일 그리드 이웃 탐색 보이드로 200개체 72fps','Cinemachine Spline 자동 이동 · 보트 탑승','Gemini REST · Android TTS 네이티브 연동'], notion:'https://app.notion.com/p/3d48e7bb577081f4bd06ff765a08f616' },
+  { id:'body', index:'02', title:'인체탐험 VR', field:'UNITY · XR', tone:0xff7ab8, tags:['Unity','XRI','URP'],
+    desc:'소화기관 내부를 직접 이동하며 학습하는 몰입형 VR 콘텐츠. 다중 씬 전환과 페이드 동기화, 커스텀 셰이더 연출을 다뤘습니다.',
+    points:['Cull Front 내벽 셰이더 · 광선 셰프트','다중 씬 전환과 페이드 동기화','OSC · NDI 외부 장비 연동'], notion:'https://app.notion.com/p/04f8e7bb5770828e9d6481d3dac5d137' },
+  { id:'aac', index:'03', title:'Unity AAC', field:'UNITY · AI · INTERACTION', tone:0xffb35a, tags:['Unity','C#','Gemini'],
+    desc:'편의점·약국·식당 같은 일상 장면에서 AAC 표현을 고르고 점원의 반응을 확인하는 의사소통 학습 앱. 룰 기반에서 LLM 자유대화로 전환했습니다.',
+    points:['선택 → 상황 속 반응 → 결과 확인 학습 루프','Gemini 자유대화 점원 · 네이티브 STT/TTS','프로필별 기록 저장'], notion:'https://app.notion.com/p/3678e7bb5770836ebaa8811cda4984c2' },
+  { id:'block', index:'04', title:'BlockTrade', field:'QUANT · WEB', tone:0x5ee0b0, tags:['React','TypeScript','PWA'],
+    desc:'복잡한 매매 전략을 조건 블록으로 조립하는 노코드 전략 빌더. 반응형 웹과 설치형 PWA로 만들었습니다.',
+    points:['블록 조립형 전략 빌더','PC · 모바일 반응형 + PWA','UI · 보안 흐름 회귀 테스트'], notion:'https://app.notion.com/p/3c18e7bb577081b6b97ff2ca3a10c062' },
+  { id:'xbit', index:'05', title:'XBIT', field:'APP · AUTOMATION', tone:0xb7a6ff, tags:['C#','.NET','SQLite'],
+    desc:'Git을 몰라도 파일 선택 한 번으로 과제를 제출하도록 반복 Git 작업을 표준화한 Windows 협업 툴.',
+    points:['파일 선택 → 브랜치 · 커밋 · 푸시 자동화','SQLite 제출 이력 · 과제 관리','팀 태스크 · 런타임 테마 전환'], notion:'#' },
+];
+const LAYOUT = [ // x, y, z, scale — right-side cluster, hero copy sits on the left
+  [ 0.0,  0.15,  0.0, 1.0],
+  [-2.35, 1.25, -0.9, 0.82],
+  [ 2.45, 1.15, -0.9, 0.82],
+  [-2.05,-1.45, -0.5, 0.86],
+  [ 2.25,-1.55, -0.5, 0.86],
+];
+
+/* ---------- renderer / scene ---------- */
+const canvas = document.getElementById('stage');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.info.autoReset = false;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x04080d);
+scene.fog = new THREE.Fog(0x04080d, 12, 24);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 60);
+const camHome = new THREE.Vector3(0, 0, 9.2), camLook = new THREE.Vector3(0, 0, 0);
+camera.position.copy(camHome);
+
+const world = new THREE.Group(); scene.add(world);
+const grid = new THREE.GridHelper(40, 40, 0x243044, 0x161d2b); grid.position.y = -3.1; scene.add(grid);
+const gridMat = grid.material; gridMat.transparent = true;
+
+const ambient = new THREE.AmbientLight(0xbcc8ff, 0.18); scene.add(ambient);
+const hemi = new THREE.HemisphereLight(0x8fb0ff, 0x1a0f22, 0); scene.add(hemi);
+const key = new THREE.DirectionalLight(0xffffff, 0); key.position.set(4, 6, 5); scene.add(key);
+const rim = new THREE.DirectionalLight(0x9cb8ff, 0); rim.position.set(-5, 2, -4); scene.add(rim);
+
+/* mini axis gizmo (top-right, like Unity's scene gizmo) */
+const gizmoRenderer = new THREE.WebGLRenderer({ canvas:document.getElementById('gizmo'), alpha:true, antialias:true }); gizmoRenderer.setPixelRatio(Math.min(devicePixelRatio, 2)); gizmoRenderer.setSize(84, 84, false);
+const gizmoScene = new THREE.Scene();
+const gizmoCam = new THREE.PerspectiveCamera(40, 1, 0.1, 10); gizmoCam.position.set(0, 0, 3.2);
+const axes = new THREE.AxesHelper(1); axes.material.linewidth = 2; gizmoScene.add(axes);
+for (const [c, p] of [[0xff5c6c,[1.25,0,0]],[0x7bff9c,[0,1.25,0]],[0x6aa8ff,[0,0,1.25]]]) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 12), new THREE.MeshBasicMaterial({ color:c })); m.position.set(...p); gizmoScene.add(m);
+}
+
+/* ---------- materials & mode bookkeeping ---------- */
+const WIRE = new THREE.MeshBasicMaterial({ color:0x5a6784, wireframe:true, transparent:true, opacity:0.9 });
+const tracked = []; // { mesh, solid, edges }
+function track(mesh, opts = {}) {
+  const solid = mesh.material; solid.transparent = true; solid.userData.opacity = solid.opacity ?? 1;
+  let edges = null;
+  if (!opts.noEdges) {
+    edges = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, 28), new THREE.LineBasicMaterial({ color:0x8fe0ff, transparent:true, opacity:0.55 }));
+    edges.visible = false; mesh.add(edges);
+  }
+  mesh.material = WIRE; mesh.userData.solid = solid;
+  tracked.push({ mesh, solid, edges });
+  return mesh;
+}
+const M = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness:0.55, metalness:0.05, ...extra });
+
+/* ---------- cube builders ---------- */
+const cubes = []; // { group, glass, light, project, update(t,dt), floatSeed }
+const S = 1.55, H = S / 2;
+
+function makeCube(project, layout, builder, i) {
+  const g = new THREE.Group(); g.position.set(layout[0], layout[1], layout[2]); g.scale.setScalar(layout[3]);
+  g.userData.base = g.position.clone(); g.userData.baseScale = layout[3];
+  // glass shell
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(S, S, S), new THREE.MeshPhysicalMaterial({ color:project.tone, roughness:0.08, metalness:0, transparent:true, opacity:0.05, side:THREE.DoubleSide, depthWrite:false }));
+  glass.userData.project = project; glass.userData.cube = i;
+  g.add(track(glass, { noEdges:true }));
+  const frame = new THREE.LineSegments(new THREE.EdgesGeometry(glass.geometry), new THREE.LineBasicMaterial({ color:project.tone, transparent:true, opacity:0.75 }));
+  g.add(frame);
+  // base plate
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(S * 0.96, 0.06, S * 0.96), M(0x0b1220, { emissive:project.tone, emissiveIntensity:0.12, roughness:0.4 }));
+  plate.position.y = -H + 0.03; g.add(track(plate));
+  // per-cube light
+  const light = new THREE.PointLight(project.tone, 0, 4.5, 2); light.position.set(0, H * 0.7, 0); g.add(light);
+  const inner = new THREE.Group(); g.add(inner);
+  const update = builder(inner, project) || (() => {});
+  world.add(g);
+  cubes.push({ group:g, glass, frame, light, project, update, seed:i * 1.7, targetScale:layout[3] });
+}
+
+/* 01 STILL — aquarium with boids */
+function buildAquarium(root, p) {
+  const water = new THREE.Mesh(new THREE.BoxGeometry(S * 0.9, S * 0.78, S * 0.9), new THREE.MeshPhysicalMaterial({ color:0x1e6fd1, transparent:true, opacity:0.22, roughness:0.15, side:THREE.BackSide, depthWrite:false }));
+  water.position.y = -0.06; root.add(track(water, { noEdges:true }));
+  const sand = new THREE.Mesh(new THREE.BoxGeometry(S * 0.9, 0.08, S * 0.9), M(0xcbb88a, { roughness:0.95 })); sand.position.y = -H + 0.1; root.add(track(sand));
+  const weeds = [];
+  for (let k = 0; k < 6; k++) {
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.03, 0.42 + Math.random() * 0.25, 5), M(0x2fa66f, { emissive:0x0e5a3a, emissiveIntensity:0.5 }));
+    w.geometry.translate(0, 0.25, 0); w.position.set((Math.random() - .5) * 1.1, -H + 0.14, (Math.random() - .5) * 1.1); w.rotation.z = (Math.random() - .5) * .3;
+    root.add(track(w)); weeds.push(w);
+  }
+  const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.18, 0), M(0x3a4a66)); rock.position.set(0.35, -H + 0.25, -0.3); rock.scale.set(1.3, .8, 1); root.add(track(rock));
+  // boids
+  const N = 64, bounds = 0.52;
+  const fish = new THREE.InstancedMesh(new THREE.ConeGeometry(0.022, 0.095, 5).rotateX(Math.PI / 2), M(0xffd166, { emissive:0xff9a3c, emissiveIntensity:0.35, roughness:0.4 }), N);
+  fish.instanceMatrix.setUsage(THREE.DynamicDrawUsage); root.add(track(fish, { noEdges:true }));
+  const pos = [], vel = [];
+  for (let k = 0; k < N; k++) { pos.push(new THREE.Vector3((Math.random() - .5) * bounds * 1.6, (Math.random() - .5) * bounds * 1.2, (Math.random() - .5) * bounds * 1.6)); vel.push(new THREE.Vector3().randomDirection().multiplyScalar(0.35)); }
+  const tmp = new THREE.Object3D(), acc = new THREE.Vector3(), d = new THREE.Vector3();
+  const centre = new THREE.Vector3(0, -0.05, 0);
+  // bubbles
+  const BN = 40, bpos = new Float32Array(BN * 3);
+  for (let k = 0; k < BN; k++) { bpos[k*3] = (Math.random() - .5) * 1.1; bpos[k*3+1] = -H + Math.random() * S * .8; bpos[k*3+2] = (Math.random() - .5) * 1.1; }
+  const bubbles = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(bpos, 3)), new THREE.PointsMaterial({ color:0xcfe8ff, size:0.03, transparent:true, opacity:0.8, depthWrite:false }));
+  bubbles.visible = false; root.add(bubbles);
+  const caustic = new THREE.PointLight(0x7ec8ff, 0, 2.2, 2); caustic.position.set(0, 0.5, 0); root.add(caustic);
+  root.userData.stats = { fish:N };
+  return (t, dt, playing) => {
+    bubbles.visible = playing; caustic.intensity = playing ? 1.6 + Math.sin(t * 3) * 0.5 : 0;
+    caustic.position.x = Math.sin(t * .8) * .4; caustic.position.z = Math.cos(t * .6) * .4;
+    for (let k = 0; k < weeds.length; k++) weeds[k].rotation.z = Math.sin(t * 1.4 + k) * .12;
+    for (let k = 0; k < N; k++) {
+      const P = pos[k], V = vel[k]; acc.set(0, 0, 0); let cnt = 0;
+      for (let j = 0; j < N; j++) { if (j === k) continue; d.subVectors(pos[j], P); const L = d.length();
+        if (L < 0.32) { cnt++; acc.addScaledVector(d, 0.35); acc.addScaledVector(vel[j], 0.25); if (L < 0.11) acc.addScaledVector(d, -3.5 / (L + .01)); } }
+      if (cnt) acc.multiplyScalar(1 / cnt);
+      d.subVectors(centre, P); acc.addScaledVector(d, 0.9);
+      const wall = bounds; ['x','y','z'].forEach(a => { const lim = a === 'y' ? wall * .72 : wall; if (P[a] > lim) acc[a] -= (P[a] - lim) * 12; if (P[a] < -lim) acc[a] += (-lim - P[a]) * 12; });
+      V.addScaledVector(acc, dt); const sp = V.length(); const want = 0.45; V.multiplyScalar(THREE.MathUtils.lerp(sp, want, 0.08) / (sp || 1));
+      P.addScaledVector(V, dt);
+      tmp.position.copy(P); tmp.lookAt(P.x + V.x, P.y + V.y, P.z + V.z); tmp.scale.setScalar(0.9 + (k % 4) * .08); tmp.updateMatrix(); fish.setMatrixAt(k, tmp.matrix);
+    }
+    fish.instanceMatrix.needsUpdate = true;
+    const a = bubbles.geometry.attributes.position; for (let k = 0; k < BN; k++) { a.array[k*3+1] += dt * (0.12 + (k % 5) * .03); a.array[k*3] += Math.sin(t * 2 + k) * .0006; if (a.array[k*3+1] > H * .7) a.array[k*3+1] = -H + .15; } a.needsUpdate = true;
+  };
+}
+
+/* 02 인체탐험 — organ tube with travelling cells and light shafts */
+function buildBody(root, p) {
+  const pts = []; for (let k = 0; k < 9; k++) { const a = k / 8 * Math.PI * 2.4; pts.push(new THREE.Vector3(Math.cos(a) * .42, -.45 + k * .11 + Math.sin(a * 2) * .06, Math.sin(a) * .42)); }
+  const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', .6);
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 120, 0.12, 12, false), new THREE.MeshPhysicalMaterial({ color:0xff6f9c, emissive:0x6a1436, emissiveIntensity:.55, roughness:.35, transparent:true, opacity:.85, side:THREE.DoubleSide }));
+  root.add(track(tube));
+  const cells = new THREE.InstancedMesh(new THREE.SphereGeometry(0.035, 8, 8), M(0xffd9e6, { emissive:0xff4f7a, emissiveIntensity:.9 }), 22); root.add(track(cells, { noEdges:true }));
+  const rays = [];
+  for (let k = 0; k < 3; k++) { const r = new THREE.Mesh(new THREE.ConeGeometry(0.16, 1.4, 12, 1, true), new THREE.MeshBasicMaterial({ color:0xffb3cc, transparent:true, opacity:0.08, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false }));
+    r.position.set(0, .05, 0); r.rotation.z = Math.PI; root.add(track(r, { noEdges:true })); rays.push(r); }
+  const tmp = new THREE.Object3D();
+  return (t, dt, playing) => {
+    for (let k = 0; k < 22; k++) { const u = ((t * .07) + k / 22) % 1; const P = curve.getPointAt(u); tmp.position.copy(P); tmp.scale.setScalar(1 + Math.sin(t * 4 + k) * .2); tmp.updateMatrix(); cells.setMatrixAt(k, tmp.matrix); }
+    cells.instanceMatrix.needsUpdate = true;
+    rays.forEach((r, k) => { r.rotation.y = t * .3 + k * 2.1; r.rotation.x = Math.sin(t * .5 + k) * .35; r.userData.solid.opacity = playing ? .07 + Math.sin(t * 1.3 + k) * .03 : 0; });
+    tube.userData.solid.emissiveIntensity = .45 + Math.sin(t * 2.2) * .18;
+  };
+}
+
+/* 03 AAC — convenience store counter with clerk */
+function buildStore(root, p) {
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(S * .92, .04, S * .92), M(0xd8dde8, { roughness:.9 })); floor.position.y = -H + .08; root.add(track(floor));
+  const counter = new THREE.Mesh(new THREE.BoxGeometry(.9, .34, .28), M(0x1a56db, { roughness:.5 })); counter.position.set(0, -H + .27, .25); root.add(track(counter));
+  const top = new THREE.Mesh(new THREE.BoxGeometry(.96, .04, .34), M(0xf5f7fb)); top.position.set(0, -H + .46, .25); root.add(track(top));
+  for (const x of [-.45, .45]) { const shelf = new THREE.Mesh(new THREE.BoxGeometry(.3, .9, .18), M(0xe9ecf3, { roughness:.8 })); shelf.position.set(x, -H + .55, -.5); root.add(track(shelf));
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) { const item = new THREE.Mesh(new THREE.BoxGeometry(.07, .09, .07), M([0xff6b6b,0xffd166,0x4ecdc4,0x8ecae6,0xff9f1c][(r*3+c)%5], { emissiveIntensity:.15 })); item.position.set(x - .09 + c * .09, -H + .2 + r * .28, -.4); root.add(track(item, { noEdges:true })); } }
+  const clerkBody = new THREE.Mesh(new THREE.CapsuleGeometry(.09, .22, 4, 10), M(0x2b3d63)); clerkBody.position.set(0, -H + .36, -.05); root.add(track(clerkBody));
+  const clerkHead = new THREE.Mesh(new THREE.SphereGeometry(.09, 12, 12), M(0xffd8b8)); clerkHead.position.set(0, -H + .64, -.05); root.add(track(clerkHead));
+  const bubble = new THREE.Group(); const bb = new THREE.Mesh(new THREE.BoxGeometry(.34, .16, .05), M(0xffffff, { emissive:0xffffff, emissiveIntensity:.35 })); bubble.add(track(bb, { noEdges:true }));
+  for (let k = 0; k < 3; k++) { const dot = new THREE.Mesh(new THREE.SphereGeometry(.018, 8, 8), M(0x1a56db, { emissive:0x1a56db, emissiveIntensity:.6 })); dot.position.set(-.07 + k * .07, 0, .03); bubble.add(track(dot, { noEdges:true })); bubble.userData['d'+k] = dot; }
+  bubble.position.set(.05, -H + .92, -.05); root.add(bubble);
+  const customer = new THREE.Mesh(new THREE.CapsuleGeometry(.08, .2, 4, 10), M(0xf2a65a)); customer.position.set(.62, -H + .34, .55); root.add(track(customer));
+  const warm = new THREE.PointLight(0xffd9a3, 0, 2.4, 2); warm.position.set(0, .55, .3); root.add(warm);
+  return (t, dt, playing) => {
+    warm.intensity = playing ? 1.4 : 0; bubble.visible = playing; bubble.position.y = -H + .92 + Math.sin(t * 2) * .02;
+    for (let k = 0; k < 3; k++) bubble.userData['d'+k].scale.setScalar(.8 + Math.max(0, Math.sin(t * 5 - k * 1.1)) * .5);
+    clerkHead.rotation.y = Math.sin(t * .9) * .35; customer.position.x = .62 - (1 - Math.cos(t * .5)) * .18 - .1;
+  };
+}
+
+/* 04 BlockTrade — candles + orbiting condition blocks */
+function buildTrading(root, p) {
+  const n = 16, candles = []; let val = 0;
+  const base = new THREE.Mesh(new THREE.BoxGeometry(S * .9, .03, .5), M(0x111a2b, { emissive:0x1a2c48, emissiveIntensity:.4 })); base.position.y = -H + .2; root.add(track(base));
+  for (let k = 0; k < n; k++) { const up = Math.random() > .45, d = (Math.random() * .12 + .03) * (up ? 1 : -1); const o = val; val += d; const c = { o, c:val, up };
+    const body = new THREE.Mesh(new THREE.BoxGeometry(.05, 1, .05), M(up ? 0x35d39a : 0xff5f7e, { emissive:up ? 0x0f7a55 : 0x8a1a35, emissiveIntensity:.6 }));
+    const wick = new THREE.Mesh(new THREE.BoxGeometry(.012, 1, .012), M(0xcfd8ea)); root.add(track(body, { noEdges:true })); root.add(track(wick, { noEdges:true })); c.body = body; c.wick = wick; candles.push(c); }
+  const blocks = [];
+  for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(.16, .1, .16), M([0x5ee0b0,0x8ecae6,0xffd166,0xb7a6ff][k], { emissiveIntensity:.5, emissive:[0x5ee0b0,0x8ecae6,0xffd166,0xb7a6ff][k], roughness:.3 })); root.add(track(b)); blocks.push(b); }
+  let timer = 0;
+  const layout = () => { const lo = Math.min(...candles.map(c => Math.min(c.o, c.c))), hi = Math.max(...candles.map(c => Math.max(c.o, c.c))), span = Math.max(hi - lo, .4);
+    candles.forEach((c, k) => { const x = -S * .42 + k * (S * .84 / (n - 1)); const y0 = -H + .3 + (c.o - lo) / span * .6, y1 = -H + .3 + (c.c - lo) / span * .6; const h = Math.max(Math.abs(y1 - y0), .012);
+      c.body.position.set(x, (y0 + y1) / 2, 0); c.body.scale.y = h; c.wick.position.set(x, (y0 + y1) / 2, 0); c.wick.scale.y = h + .08;
+      c.body.userData.solid.color.set(c.c >= c.o ? 0x35d39a : 0xff5f7e); c.body.userData.solid.emissive.set(c.c >= c.o ? 0x0f7a55 : 0x8a1a35); }); };
+  layout();
+  return (t, dt, playing) => {
+    timer += dt; const last = candles[n - 1]; last.c += Math.sin(t * 7) * dt * .08 + (Math.random() - .5) * dt * .2;
+    if (timer > 1.1) { timer = 0; const first = candles.shift(); first.o = last.c; first.c = last.c + (Math.random() - .45) * .18; candles.push(first); }
+    layout();
+    blocks.forEach((b, k) => { const a = t * .6 + k * Math.PI / 2; b.position.set(Math.cos(a) * .48, .18 + Math.sin(t * 1.5 + k) * .08, Math.sin(a) * .48); b.rotation.y = a; b.rotation.x = Math.sin(t + k) * .3; });
+  };
+}
+
+/* 05 XBIT — git graph with travelling commits */
+function buildGit(root, p) {
+  const lanes = [-.3, 0, .3]; const nodes = []; const lines = [];
+  const commits = [[0,1],[1,1],[2,0],[3,1],[3,2],[4,0],[5,1],[6,2],[7,1]]; // [x-step, lane]
+  const pos = commits.map(([s, l]) => new THREE.Vector3(-.6 + s * .17, lanes[l], 0));
+  const links = [[0,1],[1,2],[1,3],[3,4],[2,5],[5,6],[3,6],[4,7],[6,8],[7,8]];
+  pos.forEach((P, k) => { const m = new THREE.Mesh(new THREE.SphereGeometry(.04, 12, 12), M(0xb7a6ff, { emissive:0x6f5be0, emissiveIntensity:.5 })); m.position.copy(P); root.add(track(m)); nodes.push(m); });
+  links.forEach(([a, b]) => { const g = new THREE.BufferGeometry().setFromPoints([pos[a], pos[b]]); const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color:0x8c7bff, transparent:true, opacity:.7 })); root.add(l); lines.push(l); });
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(1.25, .78, .03), M(0x0e1526, { emissive:0x1b2540, emissiveIntensity:.5, roughness:.3 })); panel.position.z = -.12; root.add(track(panel));
+  const pulses = [new THREE.CatmullRomCurve3([pos[0], pos[1], pos[3], pos[4], pos[7], pos[8]]), new THREE.CatmullRomCurve3([pos[1], pos[2], pos[5], pos[6], pos[8]])].map(c => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(.05, 10, 10), new THREE.MeshBasicMaterial({ color:0xffffff })); root.add(track(m, { noEdges:true })); return { c, m }; });
+  const file = new THREE.Mesh(new THREE.BoxGeometry(.18, .22, .02), M(0xffffff, { emissive:0xffffff, emissiveIntensity:.4 })); file.position.set(-.85, .45, .1); root.add(track(file));
+  return (t, dt, playing) => {
+    pulses.forEach((p, k) => { const u = (t * .16 + k * .5) % 1; p.m.position.copy(p.c.getPointAt(u)); p.m.visible = playing; });
+    nodes.forEach((n, k) => { const near = pulses.some(p => p.m.position.distanceTo(n.position) < .09); n.userData.solid.emissiveIntensity = THREE.MathUtils.lerp(n.userData.solid.emissiveIntensity, near ? 2.2 : .5, .2); });
+    file.position.y = .45 + Math.sin(t * 1.6) * .03; file.rotation.z = Math.sin(t * .8) * .08;
+  };
+}
+
+[buildAquarium, buildBody, buildStore, buildTrading, buildGit].forEach((b, i) => makeCube(PROJECTS[i], LAYOUT[i], b, i));
+
+/* ---------- postprocessing ---------- */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.65, 0.78); composer.addPass(bloom);
+let useBloom = true;
+
+/* ---------- state machine ---------- */
+const state = { mode:'edit', playing:false, transition:0, debug:false, focus:-1, camT:1 };
+const ui = { play:document.getElementById('btn-play'), pause:document.getElementById('btn-pause'), step:document.getElementById('btn-step'), debug:document.getElementById('btn-debug'), label:document.getElementById('mode-label'), cta:document.getElementById('cta-play'), tip:document.getElementById('tip'), detail:document.getElementById('detail'), dbg:document.getElementById('debug') };
+const ease = x => 1 - Math.pow(1 - x, 3);
+
+function setMode(playing) {
+  state.playing = playing;
+  if (playing && state.mode === 'edit') { state.mode = 'entering'; state.enterAt = performance.now(); }
+  ui.play.setAttribute('aria-pressed', String(playing)); ui.pause.setAttribute('aria-pressed', String(!playing && state.mode !== 'edit'));
+  ui.label.innerHTML = playing ? 'MODE <b>PLAY</b>' : (state.mode === 'edit' ? 'MODE <b>EDIT</b>' : 'MODE <b>PAUSED</b>');
+  ui.cta.innerHTML = playing ? 'Pause Scene <span aria-hidden="true">⏸</span>' : 'Play Scene <span aria-hidden="true">▶</span>';
+  document.querySelector('.eyebrow').textContent = playing ? 'SCENE 01 · RUNNING' : 'SCENE 01 · PRESS PLAY';
+}
+ui.play.onclick = () => setMode(true);
+ui.pause.onclick = () => setMode(false);
+ui.cta.onclick = () => setMode(!state.playing);
+let stepOnce = false; ui.step.onclick = () => { if (state.mode === 'edit') setMode(true); state.playing = false; stepOnce = true; setMode(false); };
+ui.debug.onclick = () => setDebug(!state.debug);
+function setDebug(on) { state.debug = on; ui.debug.setAttribute('aria-pressed', String(on)); ui.dbg.classList.toggle('on', on);
+  tracked.forEach(t => { if (t.edges) t.edges.visible = on; }); cubes.forEach(c => { c.frame.material.opacity = on ? 1 : .75; }); }
+addEventListener('keydown', e => { if (e.target.closest('input,textarea')) return;
+  if (e.code === 'Space') { e.preventDefault(); setMode(!state.playing); } else if (e.key === 'd' || e.key === 'D') setDebug(!state.debug); else if (e.key === 'Escape') exitCube(); });
+
+/* apply transition value 0..1 (edit -> play look) to every tracked mesh, staggered per cube */
+function applyLook(globalT) {
+  cubes.forEach((c, i) => {
+    const local = THREE.MathUtils.clamp((globalT - i * .12) / .55, 0, 1), k = ease(local);
+    c.group.traverse(o => { if (!o.userData.solid) return; const solid = o.userData.solid;
+      if (k < .5) { o.material = WIRE; } else { o.material = solid; solid.opacity = solid.userData.opacity * ((k - .5) * 2); }
+    });
+    c.frame.material.color.set(k > .5 ? c.project.tone : 0x5a6784);
+    c.light.intensity = k * 1.7;
+    c.group.scale.setScalar(c.group.userData.baseScale * (0.94 + k * .06));
+  });
+  WIRE.opacity = 0.9 * (1 - THREE.MathUtils.clamp(globalT * 1.6, 0, 1)) + 0.9 * (globalT < 0.01 ? 1 : 0);
+  if (globalT > 0.01) WIRE.opacity = Math.max(0.15, 0.9 - globalT);
+  gridMat.opacity = 1 - ease(THREE.MathUtils.clamp(globalT * 1.3, 0, 1)) * .85;
+  hemi.intensity = globalT * .9; key.intensity = globalT * 1.6; rim.intensity = globalT * 1.1; ambient.intensity = .18 + globalT * .1;
+}
+applyLook(0);
+
+/* ---------- interaction: hover / focus ---------- */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(9, 9), mouse = { x:0, y:0 }; let hovered = -1;
+canvas.addEventListener('pointermove', e => { const r = canvas.getBoundingClientRect(); ndc.x = ((e.clientX - r.left) / r.width) * 2 - 1; ndc.y = -((e.clientY - r.top) / r.height) * 2 + 1; mouse.x = ndc.x; mouse.y = ndc.y; });
+canvas.addEventListener('pointerleave', () => { ndc.set(9, 9); mouse.x = mouse.y = 0; });
+canvas.addEventListener('click', e => { const r = canvas.getBoundingClientRect(); ndc.x = ((e.clientX - r.left) / r.width) * 2 - 1; ndc.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+  ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects(cubes.map(c => c.glass), false)[0];
+  if (hit && state.focus < 0) enterCube(hit.object.userData.cube); else if (!hit && state.focus >= 0) exitCube(); });
+const camFrom = camHome.clone(), camTo = camHome.clone(), lookFrom = new THREE.Vector3(), lookTo = new THREE.Vector3();
+function enterCube(i) {
+  if (state.mode === 'edit') setMode(true);
+  state.focus = i; state.camT = 0; state.camAt = performance.now(); camFrom.copy(camera.position); lookFrom.copy(camLook);
+  const c = cubes[i]; c.group.getWorldPosition(camTo); lookTo.copy(camTo); camTo.z += 3.9 * c.group.userData.baseScale + .3; camTo.y += .1; camTo.x += .55;
+  const p = c.project; document.getElementById('d-index').textContent = `${p.index} · ${p.field}`; document.getElementById('d-title').textContent = p.title; document.getElementById('d-desc').textContent = p.desc;
+  document.getElementById('d-points').innerHTML = p.points.map(s => `<li>${s}</li>`).join(''); document.getElementById('d-tags').innerHTML = p.tags.map(s => `<span>${s}</span>`).join(''); document.getElementById('d-notion').href = p.notion;
+  ui.detail.classList.add('on'); ui.detail.setAttribute('aria-hidden', 'false'); ui.tip.classList.remove('on'); document.querySelector('.hero-copy').classList.add('dim'); hovered = -1;
+}
+function exitCube() { if (state.focus < 0) return; state.focus = -1; state.camT = 0; state.camAt = performance.now(); camFrom.copy(camera.position); lookFrom.copy(camLook); camTo.copy(camHome); lookTo.set(0, 0, 0); ui.detail.classList.remove('on'); ui.detail.setAttribute('aria-hidden', 'true'); document.querySelector('.hero-copy').classList.remove('dim'); }
+document.getElementById('detail-close').onclick = exitCube;
+
+/* ---------- resize ---------- */
+function resize() {
+  const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
+  renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  const narrow = w < 900; useBloom = !narrow; bloom.enabled = useBloom;
+  world.position.x = narrow ? 0 : 1.65; camHome.z = narrow ? 11.5 : 9.2; camHome.x = narrow ? 0 : 0.35;
+  if (state.focus < 0 && state.camT >= 1) camera.position.copy(camHome);
+  camera.fov = narrow ? 44 : 38; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(canvas); resize();
+
+/* ---------- loop ---------- */
+const clock = new THREE.Clock(); let simT = 0, fpsAcc = 0, fpsN = 0, lastStat = 0;
+const tipPos = new THREE.Vector3();
+function frame() {
+  requestAnimationFrame(frame);
+  const dt = Math.min(clock.getDelta(), .05), now = clock.elapsedTime;
+  // mode transition
+  if (state.mode === 'entering') { state.transition = Math.min(1, (performance.now() - state.enterAt) / (reduced ? 200 : 1400)); applyLook(state.transition); if (state.transition >= 1) state.mode = 'play'; }
+  const running = state.playing || stepOnce; if (running) simT += stepOnce ? 1 / 30 : dt;
+  // hover
+  ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects(cubes.map(c => c.glass), false)[0]; const newHover = hit && state.focus < 0 ? hit.object.userData.cube : -1;
+  if (newHover !== hovered) { hovered = newHover; canvas.style.cursor = hovered >= 0 ? 'pointer' : (state.focus >= 0 ? 'zoom-out' : 'default'); ui.tip.classList.toggle('on', hovered >= 0);
+    if (hovered >= 0) { ui.tip.querySelector('strong').textContent = PROJECTS[hovered].title; ui.tip.querySelector('span').textContent = PROJECTS[hovered].field; } }
+  // cubes
+  cubes.forEach((c, i) => {
+    const f = c.group.userData.base; const active = hovered === i || state.focus === i;
+    const floatY = running && !reduced ? Math.sin(simT * .7 + c.seed) * .07 : 0;
+    c.group.position.set(f.x, f.y + floatY, f.z);
+    const rotSpeed = running && !reduced ? (active ? .5 : .12) : 0; c.group.rotation.y += rotSpeed * dt;
+    if (state.focus === i) c.group.rotation.y = THREE.MathUtils.lerp(c.group.rotation.y, Math.round(c.group.rotation.y / (Math.PI / 2)) * (Math.PI / 2), .06);
+    const want = c.group.userData.baseScale * (active ? 1.07 : 1) * (state.focus >= 0 && state.focus !== i ? .92 : 1);
+    if (state.mode !== 'entering') c.group.scale.setScalar(THREE.MathUtils.lerp(c.group.scale.x, want, .1));
+    if (state.mode !== 'edit') c.update(simT, running ? (stepOnce ? 1 / 30 : dt) : 0, running);
+    c.glass.userData.solid.opacity = active ? .1 : .05;
+    if (state.mode !== 'entering') c.light.intensity = THREE.MathUtils.lerp(c.light.intensity, state.mode === 'edit' ? 0 : (active ? 2.6 : 1.7), .08);
+  });
+  stepOnce = false;
+  // tip position
+  if (hovered >= 0) { cubes[hovered].group.getWorldPosition(tipPos); tipPos.y += S * .62 * cubes[hovered].group.userData.baseScale; tipPos.project(camera);
+    ui.tip.style.left = `${(tipPos.x * .5 + .5) * canvas.clientWidth}px`; ui.tip.style.top = `${(-tipPos.y * .5 + .5) * canvas.clientHeight + canvas.offsetTop}px`; }
+  // camera
+  if (state.camT < 1) { state.camT = Math.min(1, (performance.now() - state.camAt) / (reduced ? 200 : 950)); const k = ease(state.camT); camera.position.lerpVectors(camFrom, camTo, k); camLook.lerpVectors(lookFrom, lookTo, k); }
+  else if (state.focus < 0) { camera.position.x = THREE.MathUtils.lerp(camera.position.x, camHome.x + mouse.x * .45, .05); camera.position.y = THREE.MathUtils.lerp(camera.position.y, camHome.y + mouse.y * .3, .05); camera.position.z = camHome.z; }
+  camera.lookAt(camLook);
+  // render
+  renderer.info.reset();
+  if (useBloom) composer.render(); else renderer.render(scene, camera);
+  if (canvas.clientWidth >= 900) { gizmoCam.position.set(0, 0, 3.2).applyQuaternion(camera.quaternion); gizmoCam.lookAt(0, 0, 0); gizmoRenderer.render(gizmoScene, gizmoCam); }
+  // stats
+  fpsAcc += dt; fpsN++; if (now - lastStat > .5) { const r = renderer.info.render; document.getElementById('s-fps').textContent = (fpsN / fpsAcc).toFixed(0); document.getElementById('s-ms').textContent = (fpsAcc / fpsN * 1000).toFixed(1) + ' ms';
+    document.getElementById('s-calls').textContent = r.calls; document.getElementById('s-tris').textContent = r.triangles.toLocaleString(); document.getElementById('s-fish').textContent = '64 × 1 draw'; document.getElementById('s-dpr').textContent = renderer.getPixelRatio().toFixed(2); fpsAcc = 0; fpsN = 0; lastStat = now; }
+}
+frame();
+if (reduced) { setMode(true); }
+</script>
+</body>
+</html>
