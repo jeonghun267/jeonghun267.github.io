@@ -4,19 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#04080d">
-  <meta name="description" content="오정훈의 인터랙티브 포트폴리오. Unity, AI, XR와 웹 기술을 연결해 아이디어를 실제 경험으로 만듭니다.">
+  <meta name="description" content="오정훈의 인터랙티브 포트폴리오. Unity·XR과 AI로 아이디어를 실제로 움직이는 경험으로 만듭니다. 3D 씬을 직접 실행해 보세요.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>OJH — Ideas into Real Experiences</title>
-  <link rel="icon" href="assets/orb-unity.png" type="image/png">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script defer src="config.js"></script>
   <script defer src="app.js"></script>
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
+  <script type="module" src="hero3d.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#projects">프로젝트 바로 보기</a>
 <canvas id="starfield" aria-hidden="true"></canvas>
 <header class="site-header">
-  <a class="brand" href="#home" aria-label="OJH 홈"><span>OJH</span><span class="brand-dot" aria-hidden="true"></span><span class="brand-line">Build a more intelligent tomorrow.</span></a>
+  <a class="brand" href="#home" aria-label="OJH 홈"><span>OJH</span><span class="brand-dot" aria-hidden="true"></span><span class="brand-line">Unity × AI Interactive Developer</span></a>
   <nav id="main-nav" class="main-nav" aria-label="메인 메뉴">
     <a class="nav-link active" href="#home">Home</a><a class="nav-link" href="#projects">Projects</a><a class="nav-link" href="#about">About</a><a class="nav-link" href="#skills">Skills</a>
   </nav>
@@ -27,32 +29,27 @@
   </div>
 </header>
 <main>
-  <section id="home" class="hero" aria-labelledby="hero-title">
-    <img class="distant-planet" src="assets/distant-planet.png" alt="" width="346" height="492" aria-hidden="true">
+  <section id="home" class="hero3d" aria-labelledby="hero-title">
+    <canvas id="stage" aria-label="프로젝트 디오라마 큐브 다섯 개가 떠 있는 3D 씬. 큐브를 선택하면 프로젝트 상세를 열 수 있습니다."></canvas>
     <div class="hero-copy">
-      <p class="eyebrow">AI × INTERACTIVE DEVELOPER</p>
+      <p class="eyebrow" id="hero-eyebrow">SCENE 01 · PRESS PLAY</p>
       <h1 id="hero-title">Ideas into<br><span>Real Experiences.</span></h1>
-      <p class="hero-description">AI, 3D, 그리고 사람을 연결하는<br>인터랙티브한 경험을 만듭니다.</p>
-      <div class="hero-actions"><a href="#projects" class="button button-primary">View my work <img class="icon" src="assets/icons/arrow-right.svg" alt="" width="16" height="16"></a><a href="#about" class="button button-ghost">About me</a></div>
+      <p class="hero-description">Unity와 AI로 아이디어를 실제로 만지고 움직이는<br>경험으로 만드는 개발자, 오정훈입니다.</p>
+      <div class="hero-actions"><button class="button button-primary" id="cta-play" type="button"><span>Play scene</span> <img class="icon" src="assets/icons/play.svg" alt="" width="14" height="14"></button><a href="#projects" class="button button-ghost">View my work</a></div>
       <div class="focus-areas" aria-label="개발 분야"><div><strong>Unity</strong><span>Immersive worlds</span></div><div><strong>AI</strong><span>Connected intelligence</span></div><div><strong>Web</strong><span>Ideas into products</span></div></div>
     </div>
-    <div class="universe" id="universe" aria-label="행성을 선택해서 분야별 프로젝트를 탐색하세요">
-      <div class="universe-inner" id="universe-inner">
-        <canvas id="orbit-canvas" aria-hidden="true"></canvas>
-        <button class="core-planet" type="button" data-filter="all" aria-label="전체 프로젝트 보기">
-          <span class="core-float"><img class="globe-art" src="assets/globe.png" alt="푸른 빛의 지구" width="356" height="356" fetchpriority="high"><span class="core-label"><strong>OJH</strong><span>AI × INTERACTIVE<br>DEVELOPER</span></span></span>
-        </button>
-        <button class="planet planet-ai" data-filter="ai" type="button" aria-label="AI 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-ai.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>AI AGENT</strong><span>Automate<br>Collaborate<br>Create</span></span></button>
-        <button class="planet planet-quant" data-filter="quant" type="button" aria-label="퀀트 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-quant.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>QUANT</strong><span>Data<br>Trading<br>Strategies</span></span></button>
-        <button class="planet planet-unity" data-filter="unity" type="button" aria-label="Unity·3D 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-unity.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>UNITY / 3D</strong><span>Interactive<br>Simulation<br>Metaverse</span></span></button>
-        <button class="planet planet-fullstack" data-filter="web" type="button" aria-label="웹·앱 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-fullstack.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>FULL STACK</strong><span>Build<br>Integrate<br>Scale</span></span></button>
-        <button class="planet planet-creative" data-filter="creative" type="button" aria-label="인터랙티브 콘텐츠 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-creative.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>CREATIVE</strong><span>Turn ideas<br>into<br>Experiences</span></span></button>
-        <img class="terrain" src="assets/terrain.png" alt="" width="1010" height="132" aria-hidden="true">
-        <img class="observer" src="assets/observer.png" alt="" width="41" height="55" aria-hidden="true">
-      </div>
-      <div class="universe-hint"><img class="icon" src="assets/icons/mouse-pointer.svg" alt="" width="10" height="10"><span id="universe-hint-text">SELECT A WORLD. EXPLORE AN IDEA.</span></div>
+    <div class="toolbar" role="group" aria-label="씬 제어">
+      <button class="tb" id="btn-play" type="button" aria-pressed="false" aria-label="씬 실행" title="Play (Space)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2l11 6-11 6z"/></svg></button>
+      <button class="tb" id="btn-pause" type="button" aria-pressed="false" aria-label="씬 일시정지" title="Pause"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg></button>
+      <button class="tb" id="btn-step" type="button" aria-label="한 프레임 진행" title="Step"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2l8 6-8 6zM12 2h2v12h-2z"/></svg></button>
+      <span class="tb-sep" aria-hidden="true"></span><span class="tb-label" id="mode-label">MODE <b>EDIT</b></span><span class="tb-sep" aria-hidden="true"></span>
+      <button class="tb tb-text" id="btn-debug" type="button" aria-pressed="false" aria-label="디버그 오버레이" title="Debug (D)">DEBUG</button>
     </div>
-    <aside class="hero-aside"><a class="scroll-cue" href="#projects"><span>SCROLL TO<br><b>EXPLORE</b></span><img class="icon" src="assets/icons/arrow-down.svg" alt="" width="14" height="14"></a><blockquote><span class="quote-mark" aria-hidden="true">“</span>Technology is a tool.<br>People make it<br>meaningful.</blockquote></aside>
+    <div class="gizmo-note"><canvas id="gizmo" width="84" height="84" aria-hidden="true"></canvas>SCENE VIEW<br>HOVER · CLICK</div>
+    <div class="hud" aria-hidden="true"><kbd>Space</kbd> Play / Pause <kbd>D</kbd> Debug <kbd>Esc</kbd> Back</div>
+    <div class="debug" id="debug" aria-live="polite"><div class="head">RUNTIME STATS</div><div class="row"><span>FPS</span><b id="s-fps">—</b></div><div class="row"><span>Frame</span><b id="s-ms">—</b></div><div class="row"><span>Draw calls</span><b id="s-calls">—</b></div><div class="row"><span>Triangles</span><b id="s-tris">—</b></div><div class="row"><span>Fish instances</span><b id="s-fish">—</b></div><div class="row"><span>DPR</span><b id="s-dpr">—</b></div></div>
+    <div class="tip" id="tip" aria-hidden="true"><strong></strong><span></span></div>
+    <aside class="hero-aside"><a class="scroll-cue" href="#projects"><span>SCROLL TO<br><b>EXPLORE</b></span><img class="icon" src="assets/icons/arrow-down.svg" alt="" width="14" height="14"></a></aside>
   </section>
   <section id="projects" class="projects-section page-section" aria-labelledby="projects-title">
     <div class="section-heading"><div><p class="eyebrow"><span class="tiny-dot" aria-hidden="true"></span> SELECTED WORK</p><h2 id="projects-title">프로젝트로 증명하는 아이디어<span class="heading-period">.</span></h2><p class="section-intro">다양한 기술을 연결해, 실제로 경험할 수 있는 결과로.</p></div><a href="#projects" id="view-all" class="text-link">View all projects <img class="icon" src="assets/icons/arrow-right.svg" alt="" width="14" height="14"></a></div>

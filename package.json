@@ -5,7 +5,7 @@
   "description": "An offline-capable, responsive orbital portfolio for OJH",
   "scripts": {
     "dev": "node server.mjs",
-    "check": "node --check app.js && node --check config.js"
+    "check": "node --check app.js && node --check config.js && node --check hero3d.js"
   },
   "engines": { "node": ">=18.18.0" }
 }

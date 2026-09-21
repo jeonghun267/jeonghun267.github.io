@@ -101,3 +101,8 @@ No public deployment, domain connection, backend, or Notion API synchronization 
 - [x] Twelve viewport widths checked for overflow.
 - [x] Primary interactions and error console checked.
 - [x] Standalone HTML, source, assets, licenses, and documentation packaged.
+
+
+## 2026-09-21 — 히어로 교체
+
+우주·행성 이미지 레이어 히어로를 Three.js 디오라마 큐브 씬(`hero3d.js`)으로 교체했습니다. 위 항목 중 행성·궤도·패럴랙스 관련 검수는 더 이상 해당하지 않습니다. 새 히어로는 1440·375px에서 EDIT→PLAY 전환, 호버 라벨, 큐브 클릭→상세 창→복귀, DEBUG 오버레이, 모바일 세로 배치를 확인했습니다.

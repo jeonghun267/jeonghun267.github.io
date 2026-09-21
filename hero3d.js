@@ -1,188 +1,21 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OJH — Play Mode Concept</title>
-<meta name="description" content="Three.js 히어로 시안: 디오라마 큐브 + Edit→Play 전환 + Debug 오버레이">
-<style>
-:root{color-scheme:dark;--bg:#04080d;--text:#f0f3fa;--muted:#a6b1c7;--soft:#75829a;--line:#242d3c;--accent:#b5b5f5;--blue:#94bcf6;--pad:clamp(20px,3vw,60px);--font:Inter,"Segoe UI","Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-button:focus-visible{outline:2px solid #c4ceff;outline-offset:4px;border-radius:8px}
 
-.site-header{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--pad);position:relative;z-index:20}
-.brand{display:flex;align-items:center;gap:14px;white-space:nowrap}
-.brand>span:first-child{font-size:22px;font-weight:500;letter-spacing:1px}
-.brand-dot{width:5px;height:5px;background:#bbbef3;border-radius:50%;box-shadow:0 0 14px #889ff599}
-.brand-line{font-size:11px;color:var(--muted)}
-.nav{display:flex;gap:28px;font-size:12px;color:#b6bfd2}
-.nav span:first-child{color:#fff}
-
-.hero{position:relative;height:calc(100dvh - 76px);min-height:560px;isolation:isolate;overflow:hidden}
-#stage{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
-.hero-copy{position:absolute;top:12%;left:var(--pad);width:min(40%,520px);z-index:5;pointer-events:none}
-.hero-copy a,.hero-copy button{pointer-events:auto}.hero-copy{transition:opacity .4s,transform .5s}.hero-copy.dim{opacity:0;transform:translateX(-24px);pointer-events:none}.hero-copy.dim *{pointer-events:none}
-.eyebrow{font-size:10px;letter-spacing:.22em;font-weight:500;color:#a7b9d4;margin:0}
-.hero h1{font-size:clamp(34px,3.5vw,64px);font-weight:550;letter-spacing:-.045em;line-height:1.14;margin:16px 0 0}
-.hero h1 span{color:#c2bef6}
-.hero-desc{font-size:clamp(13px,1vw,16px);line-height:1.9;color:#b6c2d8;margin:22px 0 0;max-width:420px}
-.hero-actions{display:flex;gap:12px;margin-top:26px}
-.button{display:inline-flex;align-items:center;gap:14px;padding:0 22px;min-height:42px;border-radius:30px;font-size:12px;font-weight:550;transition:transform .2s,background .2s;white-space:nowrap}
-.button:hover{transform:translateY(-2px)}
-.button-primary{background:#f1f3fd;color:#080d19;border:1px solid #dce7ff}
-.button-ghost{border:1px solid #6a778d;font-weight:400}
-.button-ghost:hover{background:#141d2a}
-
-/* Unity-style toolbar */
-.toolbar{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:6px;padding:6px;border:1px solid #2b3446;background:#0c111acc;backdrop-filter:blur(10px);border-radius:12px}
-.tb{width:38px;height:32px;display:grid;place-items:center;border-radius:8px;color:#c8d2e6;transition:background .15s,color .15s}
-.tb:hover{background:#1a2230;color:#fff}
-.tb[aria-pressed=true]{background:#2c5aa8;color:#fff;box-shadow:inset 0 0 0 1px #6b9cf0}
-.tb svg{width:14px;height:14px;fill:currentColor}
-.tb-sep{width:1px;height:20px;background:#2b3446;margin:0 4px}
-.tb-label{font-size:10px;letter-spacing:.14em;color:#8e9cb5;padding:0 10px 0 6px;min-width:64px;text-align:center}
-.tb-label b{font-weight:600;color:#e9eefb}
-
-/* HUD */
-.hud{position:absolute;left:var(--pad);bottom:28px;z-index:6;font-size:10px;letter-spacing:.14em;color:#9aabc3;display:flex;align-items:center;gap:14px}
-.hud kbd{font:inherit;padding:3px 7px;border:1px solid #3a475c;border-radius:5px;color:#dbe3f2}
-.debug{position:absolute;right:var(--pad);bottom:28px;z-index:6;display:none;min-width:190px;padding:12px 14px;border:1px solid #2b3446;background:#0a0f18d9;backdrop-filter:blur(8px);border-radius:10px;font:11px/1.8 ui-monospace,Menlo,Consolas,monospace;color:#b9c6dc}
-.debug.on{display:block}
-.debug b{color:#8fe0ff;font-weight:500}
-.debug .row{display:flex;justify-content:space-between;gap:16px}
-.debug .head{font-size:9px;letter-spacing:.18em;color:#6f7d95;margin-bottom:4px}
-
-/* hover label */
-.tip{position:absolute;z-index:7;pointer-events:none;transform:translate(-50%,-100%);opacity:0;transition:opacity .15s;text-align:center;filter:drop-shadow(0 2px 8px #000)}
-.tip.on{opacity:1}
-.tip strong{display:block;font-size:13px;font-weight:650;letter-spacing:.02em}
-.tip span{display:block;font-size:10px;letter-spacing:.12em;color:#9fb2cc;margin-top:4px}
-
-/* detail panel */
-.detail{position:absolute;z-index:12;top:50%;right:var(--pad);transform:translate(24px,-50%);width:min(380px,calc(100% - 2*var(--pad)));padding:26px 26px 22px;border:1px solid #3a4760;border-radius:18px;background:#0b111bf5;backdrop-filter:blur(16px);box-shadow:0 30px 120px #000c;opacity:0;pointer-events:none;transition:opacity .3s,transform .35s cubic-bezier(.2,.7,.2,1)}
-.detail.on{opacity:1;pointer-events:auto;transform:translate(0,-50%)}
-.detail .index{font-size:9px;letter-spacing:.16em;color:#8e9cb3}
-.detail h2{font-size:28px;letter-spacing:-.03em;font-weight:500;margin:8px 0 0}
-.detail p{font-size:13px;line-height:1.85;color:#b7c5dc;margin:14px 0 0;word-break:keep-all}
-.detail ul{margin:14px 0 0;padding-left:16px;font-size:12px;line-height:1.9;color:#b6c3da}
-.detail .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:16px}
-.detail .tags span{font-size:9px;padding:3px 8px;border:1px solid #3a475d;border-radius:20px;color:#c9d3e5}
-.detail .actions{display:flex;gap:10px;margin-top:22px;align-items:center}
-.detail .close{position:absolute;right:14px;top:14px;width:32px;height:32px;border-radius:50%;border:1px solid #717f9366;display:grid;place-items:center;font-size:16px;color:#c8d2e6}
-.detail .close:hover{background:#1a2230}
-
-.gizmo-note{position:absolute;top:18px;right:var(--pad);z-index:6;font-size:9px;letter-spacing:.16em;color:#6f7d95;text-align:right;line-height:1.7;display:flex;flex-direction:column;align-items:flex-end;gap:6px}#gizmo{width:84px;height:84px;display:block}
-
-@media (max-width:900px){
-  .brand-line{display:none}
-  .hero{height:auto;min-height:0;display:flex;flex-direction:column}
-  #stage{position:relative;height:62vw;min-height:380px;order:0}
-  .toolbar{position:relative;top:auto;left:auto;transform:none;order:1;align-self:center;margin-top:-24px}
-  .hero-copy{position:static;width:auto;padding:24px var(--pad) 8px;order:2}
-  .hero-copy.dim{opacity:1;transform:none;pointer-events:auto}
-  .hud,.gizmo-note{display:none}
-  .debug{bottom:auto;top:14px;right:14px;min-width:150px}
-  .detail{right:50%;top:auto;bottom:70px;transform:translate(50%,24px)}
-  .detail.on{transform:translate(50%,0)}
-  .nav{display:none}
-}
-@media (prefers-reduced-motion:reduce){.button:hover{transform:none}}
-</style>
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
-</script>
-</head>
-<body>
-<header class="site-header">
-  <div class="brand"><span>OHJH</span><span class="brand-dot"></span><span class="brand-line">UNITY × INTERACTIVE DEVELOPER</span></div>
-  <nav class="nav" aria-label="시안 메뉴"><span>Home</span><span>Projects</span><span>About</span><span>Skills</span><span>Contact</span></nav>
-  <a class="button button-ghost" href="mailto:popmin07@gmail.com" style="min-height:36px">Let's Talk</a>
-</header>
-
-<section class="hero" aria-label="인터랙티브 씬">
-  <canvas id="stage" aria-label="프로젝트 디오라마 큐브 다섯 개가 떠 있는 3D 씬"></canvas>
-
-  <div class="hero-copy">
-    <p class="eyebrow">SCENE 01 · PRESS PLAY</p>
-    <h1>Ideas into<br><span>Real Experiences.</span></h1>
-    <p class="hero-desc">Unity와 AI로 아이디어를 실제로 만지고 움직이는 경험으로 만드는 개발자, 오정훈입니다. 위의 ▶ 버튼을 누르면 씬이 실행됩니다.</p>
-    <div class="hero-actions">
-      <button class="button button-primary" id="cta-play" type="button">Play Scene <span aria-hidden="true">▶</span></button>
-      <a class="button button-ghost" href="#projects">Explore Work</a>
-    </div>
-  </div>
-
-  <div class="toolbar" role="group" aria-label="씬 제어">
-    <button class="tb" id="btn-play" type="button" aria-pressed="false" aria-label="플레이" title="Play (Space)">
-      <svg viewBox="0 0 16 16"><path d="M3 2l11 6-11 6z"/></svg>
-    </button>
-    <button class="tb" id="btn-pause" type="button" aria-pressed="false" aria-label="일시정지" title="Pause">
-      <svg viewBox="0 0 16 16"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg>
-    </button>
-    <button class="tb" id="btn-step" type="button" aria-label="한 프레임 진행" title="Step">
-      <svg viewBox="0 0 16 16"><path d="M3 2l8 6-8 6zM12 2h2v12h-2z"/></svg>
-    </button>
-    <span class="tb-sep"></span>
-    <span class="tb-label" id="mode-label">MODE <b>EDIT</b></span>
-    <span class="tb-sep"></span>
-    <button class="tb" id="btn-debug" type="button" aria-pressed="false" aria-label="디버그 오버레이" title="Debug (D)" style="width:auto;padding:0 12px;font-size:10px;letter-spacing:.12em">DEBUG</button>
-  </div>
-
-  <div class="gizmo-note"><canvas id="gizmo" width="84" height="84" aria-hidden="true"></canvas>SCENE VIEW<br>DRAG · HOVER · CLICK</div>
-  <div class="hud"><kbd>Space</kbd> Play / Pause <kbd>D</kbd> Debug <kbd>Esc</kbd> Back</div>
-
-  <div class="debug" id="debug" aria-live="polite">
-    <div class="head">RUNTIME STATS</div>
-    <div class="row"><span>FPS</span><b id="s-fps">—</b></div>
-    <div class="row"><span>Frame</span><b id="s-ms">—</b></div>
-    <div class="row"><span>Draw calls</span><b id="s-calls">—</b></div>
-    <div class="row"><span>Triangles</span><b id="s-tris">—</b></div>
-    <div class="row"><span>Instances (fish)</span><b id="s-fish">—</b></div>
-    <div class="row"><span>DPR</span><b id="s-dpr">—</b></div>
-  </div>
-
-  <div class="tip" id="tip"><strong></strong><span></span></div>
-
-  <aside class="detail" id="detail" aria-hidden="true">
-    <button class="close" id="detail-close" type="button" aria-label="닫기">×</button>
-    <div class="index" id="d-index"></div>
-    <h2 id="d-title"></h2>
-    <p id="d-desc"></p>
-    <ul id="d-points"></ul>
-    <div class="tags" id="d-tags"></div>
-    <div class="actions">
-      <a class="button button-primary" id="d-notion" target="_blank" rel="noopener noreferrer" style="min-height:38px">개발 문서 ↗</a>
-      <span style="font-size:9px;color:#95a4bc">Notion · 게시 주소로 교체 예정</span>
-    </div>
-  </aside>
-</section>
-
-<script type="module">
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
+/* OJH hero scene — five diorama cubes, Unity-style Edit/Play toolbar, debug overlay.
+   Content comes from config.js (window.PORTFOLIO_CONFIG). Clicking a cube asks app.js to open
+   the project dialog via the 'ojh:open-project' event; app.js reports back with 'ojh:project-closed'.
+   Rendering is capped by devicePixelRatio 1.5, bloom is skipped on narrow screens, and everything
+   idles when app.js says motion is off (window.OJH_HERO.setRunning). */
 /* ---------- data ---------- */
-const PROJECTS = [
-  { id:'still', index:'01', title:'STILL', field:'UNITY · VR · AI', tone:0x5aa9ff, tags:['Unity','Gemini','Quest 2'],
-    desc:'가상 아쿠아리움 속에서 해양생물을 만나고 탐색하는 VR 도감. 보이드 군집 시뮬레이션과 Gemini 해설, 한국어 TTS를 연결했습니다.',
-    points:['균일 그리드 이웃 탐색 보이드로 200개체 72fps','Cinemachine Spline 자동 이동 · 보트 탑승','Gemini REST · Android TTS 네이티브 연동'], notion:'https://app.notion.com/p/3d48e7bb577081f4bd06ff765a08f616' },
-  { id:'body', index:'02', title:'인체탐험 VR', field:'UNITY · XR', tone:0xff7ab8, tags:['Unity','XRI','URP'],
-    desc:'소화기관 내부를 직접 이동하며 학습하는 몰입형 VR 콘텐츠. 다중 씬 전환과 페이드 동기화, 커스텀 셰이더 연출을 다뤘습니다.',
-    points:['Cull Front 내벽 셰이더 · 광선 셰프트','다중 씬 전환과 페이드 동기화','OSC · NDI 외부 장비 연동'], notion:'https://app.notion.com/p/04f8e7bb5770828e9d6481d3dac5d137' },
-  { id:'aac', index:'03', title:'Unity AAC', field:'UNITY · AI · INTERACTION', tone:0xffb35a, tags:['Unity','C#','Gemini'],
-    desc:'편의점·약국·식당 같은 일상 장면에서 AAC 표현을 고르고 점원의 반응을 확인하는 의사소통 학습 앱. 룰 기반에서 LLM 자유대화로 전환했습니다.',
-    points:['선택 → 상황 속 반응 → 결과 확인 학습 루프','Gemini 자유대화 점원 · 네이티브 STT/TTS','프로필별 기록 저장'], notion:'https://app.notion.com/p/3678e7bb5770836ebaa8811cda4984c2' },
-  { id:'block', index:'04', title:'BlockTrade', field:'QUANT · WEB', tone:0x5ee0b0, tags:['React','TypeScript','PWA'],
-    desc:'복잡한 매매 전략을 조건 블록으로 조립하는 노코드 전략 빌더. 반응형 웹과 설치형 PWA로 만들었습니다.',
-    points:['블록 조립형 전략 빌더','PC · 모바일 반응형 + PWA','UI · 보안 흐름 회귀 테스트'], notion:'https://app.notion.com/p/3c18e7bb577081b6b97ff2ca3a10c062' },
-  { id:'xbit', index:'05', title:'XBIT', field:'APP · AUTOMATION', tone:0xb7a6ff, tags:['C#','.NET','SQLite'],
-    desc:'Git을 몰라도 파일 선택 한 번으로 과제를 제출하도록 반복 Git 작업을 표준화한 Windows 협업 툴.',
-    points:['파일 선택 → 브랜치 · 커밋 · 푸시 자동화','SQLite 제출 이력 · 과제 관리','팀 태스크 · 런타임 테마 전환'], notion:'#' },
-];
+const CONFIG = window.PORTFOLIO_CONFIG || { projects: [] };
+const BUILDERS = { still:'aquarium', humanbody:'body', aac:'store', block:'trading', xbit:'git' };
+const TONES = { still:0x5aa9ff, humanbody:0xff7ab8, aac:0xffb35a, block:0x5ee0b0, xbit:0xb7a6ff };
+const ORDER = ['still', 'humanbody', 'aac', 'block', 'xbit'];
+const PROJECTS = ORDER.map(id => CONFIG.projects.find(p => p.id === id)).filter(Boolean)
+  .map(p => ({ id:p.id, title:p.title, field:p.category, tone:TONES[p.id], builder:BUILDERS[p.id] }));
 const LAYOUT = [ // x, y, z, scale — right-side cluster, hero copy sits on the left
   [ 0.0,  0.15,  0.0, 1.0],
   [-2.35, 1.25, -0.9, 0.82],
@@ -193,6 +26,7 @@ const LAYOUT = [ // x, y, z, scale — right-side cluster, hero copy sits on the
 
 /* ---------- renderer / scene ---------- */
 const canvas = document.getElementById('stage');
+if (!canvas) throw new Error('hero canvas missing');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false, powerPreference:'high-performance' });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
@@ -392,7 +226,8 @@ function buildGit(root, p) {
   };
 }
 
-[buildAquarium, buildBody, buildStore, buildTrading, buildGit].forEach((b, i) => makeCube(PROJECTS[i], LAYOUT[i], b, i));
+const BUILD = { aquarium:buildAquarium, body:buildBody, store:buildStore, trading:buildTrading, git:buildGit };
+PROJECTS.forEach((p, i) => makeCube(p, LAYOUT[i], BUILD[p.builder], i));
 
 /* ---------- postprocessing ---------- */
 const composer = new EffectComposer(renderer);
@@ -402,7 +237,7 @@ let useBloom = true;
 
 /* ---------- state machine ---------- */
 const state = { mode:'edit', playing:false, transition:0, debug:false, focus:-1, camT:1 };
-const ui = { play:document.getElementById('btn-play'), pause:document.getElementById('btn-pause'), step:document.getElementById('btn-step'), debug:document.getElementById('btn-debug'), label:document.getElementById('mode-label'), cta:document.getElementById('cta-play'), tip:document.getElementById('tip'), detail:document.getElementById('detail'), dbg:document.getElementById('debug') };
+const ui = { play:document.getElementById('btn-play'), pause:document.getElementById('btn-pause'), step:document.getElementById('btn-step'), debug:document.getElementById('btn-debug'), label:document.getElementById('mode-label'), cta:document.getElementById('cta-play'), tip:document.getElementById('tip'), dbg:document.getElementById('debug'), copy:document.querySelector('.hero-copy'), eyebrow:document.getElementById('hero-eyebrow') };
 const ease = x => 1 - Math.pow(1 - x, 3);
 
 function setMode(playing) {
@@ -410,17 +245,17 @@ function setMode(playing) {
   if (playing && state.mode === 'edit') { state.mode = 'entering'; state.enterAt = performance.now(); }
   ui.play.setAttribute('aria-pressed', String(playing)); ui.pause.setAttribute('aria-pressed', String(!playing && state.mode !== 'edit'));
   ui.label.innerHTML = playing ? 'MODE <b>PLAY</b>' : (state.mode === 'edit' ? 'MODE <b>EDIT</b>' : 'MODE <b>PAUSED</b>');
-  ui.cta.innerHTML = playing ? 'Pause Scene <span aria-hidden="true">⏸</span>' : 'Play Scene <span aria-hidden="true">▶</span>';
-  document.querySelector('.eyebrow').textContent = playing ? 'SCENE 01 · RUNNING' : 'SCENE 01 · PRESS PLAY';
+  if (ui.cta) ui.cta.querySelector('span').textContent = playing ? 'Pause scene' : 'Play scene';
+  if (ui.eyebrow) ui.eyebrow.textContent = playing ? 'SCENE 01 · RUNNING' : 'SCENE 01 · PRESS PLAY';
 }
 ui.play.onclick = () => setMode(true);
 ui.pause.onclick = () => setMode(false);
-ui.cta.onclick = () => setMode(!state.playing);
+if (ui.cta) ui.cta.onclick = () => setMode(!state.playing);
 let stepOnce = false; ui.step.onclick = () => { if (state.mode === 'edit') setMode(true); state.playing = false; stepOnce = true; setMode(false); };
 ui.debug.onclick = () => setDebug(!state.debug);
 function setDebug(on) { state.debug = on; ui.debug.setAttribute('aria-pressed', String(on)); ui.dbg.classList.toggle('on', on);
   tracked.forEach(t => { if (t.edges) t.edges.visible = on; }); cubes.forEach(c => { c.frame.material.opacity = on ? 1 : .75; }); }
-addEventListener('keydown', e => { if (e.target.closest('input,textarea')) return;
+addEventListener('keydown', e => { if (e.target.closest('input,textarea,button,a,dialog')) return;
   if (e.code === 'Space') { e.preventDefault(); setMode(!state.playing); } else if (e.key === 'd' || e.key === 'D') setDebug(!state.debug); else if (e.key === 'Escape') exitCube(); });
 
 /* apply transition value 0..1 (edit -> play look) to every tracked mesh, staggered per cube */
@@ -453,18 +288,20 @@ function enterCube(i) {
   if (state.mode === 'edit') setMode(true);
   state.focus = i; state.camT = 0; state.camAt = performance.now(); camFrom.copy(camera.position); lookFrom.copy(camLook);
   const c = cubes[i]; c.group.getWorldPosition(camTo); lookTo.copy(camTo); camTo.z += 3.9 * c.group.userData.baseScale + .3; camTo.y += .1; camTo.x += .55;
-  const p = c.project; document.getElementById('d-index').textContent = `${p.index} · ${p.field}`; document.getElementById('d-title').textContent = p.title; document.getElementById('d-desc').textContent = p.desc;
-  document.getElementById('d-points').innerHTML = p.points.map(s => `<li>${s}</li>`).join(''); document.getElementById('d-tags').innerHTML = p.tags.map(s => `<span>${s}</span>`).join(''); document.getElementById('d-notion').href = p.notion;
-  ui.detail.classList.add('on'); ui.detail.setAttribute('aria-hidden', 'false'); ui.tip.classList.remove('on'); document.querySelector('.hero-copy').classList.add('dim'); hovered = -1;
+  ui.tip.classList.remove('on'); hovered = -1; if (ui.copy) ui.copy.classList.add('dim');
+  window.setTimeout(() => window.dispatchEvent(new CustomEvent('ojh:open-project', { detail:{ id:c.project.id, opener:canvas } })), reduced ? 0 : 520);
 }
-function exitCube() { if (state.focus < 0) return; state.focus = -1; state.camT = 0; state.camAt = performance.now(); camFrom.copy(camera.position); lookFrom.copy(camLook); camTo.copy(camHome); lookTo.set(0, 0, 0); ui.detail.classList.remove('on'); ui.detail.setAttribute('aria-hidden', 'true'); document.querySelector('.hero-copy').classList.remove('dim'); }
-document.getElementById('detail-close').onclick = exitCube;
-
+function exitCube() {
+  if (state.focus < 0) return;
+  state.focus = -1; state.camT = 0; state.camAt = performance.now(); camFrom.copy(camera.position); lookFrom.copy(camLook); camTo.copy(camHome); lookTo.set(0, 0, 0);
+  if (ui.copy) ui.copy.classList.remove('dim');
+}
+window.addEventListener('ojh:project-closed', exitCube);
 /* ---------- resize ---------- */
 function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
   renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
-  const narrow = w < 900; useBloom = !narrow; bloom.enabled = useBloom;
+  const narrow = w < 700; useBloom = !narrow; bloom.enabled = useBloom;
   world.position.x = narrow ? 0 : 1.65; camHome.z = narrow ? 11.5 : 9.2; camHome.x = narrow ? 0 : 0.35;
   if (state.focus < 0 && state.camT >= 1) camera.position.copy(camHome);
   camera.fov = narrow ? 44 : 38; camera.updateProjectionMatrix();
@@ -472,14 +309,17 @@ function resize() {
 new ResizeObserver(resize).observe(canvas); resize();
 
 /* ---------- loop ---------- */
+let externalRunning = !document.body.classList.contains('motion-paused');
+window.OJH_HERO = Object.freeze({ setRunning(v) { externalRunning = Boolean(v); }, play() { setMode(true); }, isPlaying() { return state.playing; } });
 const clock = new THREE.Clock(); let simT = 0, fpsAcc = 0, fpsN = 0, lastStat = 0;
 const tipPos = new THREE.Vector3();
 function frame() {
   requestAnimationFrame(frame);
+  if (document.hidden) return;
   const dt = Math.min(clock.getDelta(), .05), now = clock.elapsedTime;
   // mode transition
   if (state.mode === 'entering') { state.transition = Math.min(1, (performance.now() - state.enterAt) / (reduced ? 200 : 1400)); applyLook(state.transition); if (state.transition >= 1) state.mode = 'play'; }
-  const running = state.playing || stepOnce; if (running) simT += stepOnce ? 1 / 30 : dt;
+  const running = (state.playing && externalRunning) || stepOnce; if (running) simT += stepOnce ? 1 / 30 : dt;
   // hover
   ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects(cubes.map(c => c.glass), false)[0]; const newHover = hit && state.focus < 0 ? hit.object.userData.cube : -1;
   if (newHover !== hovered) { hovered = newHover; canvas.style.cursor = hovered >= 0 ? 'pointer' : (state.focus >= 0 ? 'zoom-out' : 'default'); ui.tip.classList.toggle('on', hovered >= 0);
@@ -508,13 +348,10 @@ function frame() {
   // render
   renderer.info.reset();
   if (useBloom) composer.render(); else renderer.render(scene, camera);
-  if (canvas.clientWidth >= 900) { gizmoCam.position.set(0, 0, 3.2).applyQuaternion(camera.quaternion); gizmoCam.lookAt(0, 0, 0); gizmoRenderer.render(gizmoScene, gizmoCam); }
+  if (canvas.clientWidth >= 700) { gizmoCam.position.set(0, 0, 3.2).applyQuaternion(camera.quaternion); gizmoCam.lookAt(0, 0, 0); gizmoRenderer.render(gizmoScene, gizmoCam); }
   // stats
   fpsAcc += dt; fpsN++; if (now - lastStat > .5) { const r = renderer.info.render; document.getElementById('s-fps').textContent = (fpsN / fpsAcc).toFixed(0); document.getElementById('s-ms').textContent = (fpsAcc / fpsN * 1000).toFixed(1) + ' ms';
-    document.getElementById('s-calls').textContent = r.calls; document.getElementById('s-tris').textContent = r.triangles.toLocaleString(); document.getElementById('s-fish').textContent = '64 × 1 draw'; document.getElementById('s-dpr').textContent = renderer.getPixelRatio().toFixed(2); fpsAcc = 0; fpsN = 0; lastStat = now; }
+    document.getElementById('s-calls').textContent = r.calls; document.getElementById('s-tris').textContent = r.triangles.toLocaleString(); document.getElementById('s-fish').textContent = '64 · 1 draw'; document.getElementById('s-dpr').textContent = renderer.getPixelRatio().toFixed(2); fpsAcc = 0; fpsN = 0; lastStat = now; }
 }
 frame();
 if (reduced) { setMode(true); }
-</script>
-</body>
-</html>

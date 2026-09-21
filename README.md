@@ -1,107 +1,54 @@
-# OJH — Interactive Orbit Portfolio
+# OJH — Interactive Portfolio
 
-승인한 다크 우주 포트폴리오 시안을 바탕으로 만든 반응형 프론트엔드입니다.
-마우스에 반응하는 이미지 레이어, 움직이는 궤도, 분야별 필터, 프로젝트 상세 창, 실제 Notion 문서 링크를 구현했습니다.
+오정훈(OJH)의 인터랙티브 포트폴리오. 공개 주소: **https://jeonghun267.github.io/**
 
-## 가장 빠르게 실행하기
+첫 화면은 Three.js로 만든 **디오라마 큐브 씬**입니다. Unity 에디터처럼 EDIT 모드(와이어프레임)로 시작해 ▶ 버튼을 누르면
+큐브가 차례로 빌드되며 프로젝트별 미니 월드가 살아 움직입니다. 큐브를 클릭하면 카메라가 다이브하고 프로젝트 상세 창이 열립니다.
+DEBUG 토글은 FPS·드로우콜·삼각형 수를 오버레이합니다.
 
-전달된 `OJH_Interactive_Portfolio.html`을 Chrome 또는 Edge 같은 웹 브라우저에서 여세요.
-이미지·아이콘·스타일·스크립트가 모두 들어 있는 독립 파일입니다. 화면과 인터랙션에는 인터넷 연결이나 설치가 필요하지 않습니다.
-Notion·GitHub·메일 링크로 외부 서비스를 여는 동작은 해당 서비스의 연결과 앱 설정이 필요합니다.
-휴대폰의 단순 HTML 미리보기 앱은 JavaScript를 지원하지 않을 수 있으므로, 브라우저에서 여는 것이 필요합니다.
+## 실행
 
-압축 파일의 수정용 소스는 `index.html`을 브라우저로 열어서 실행할 수 있습니다. `assets`, `config.js`, `app.js`, `styles.css`를 같은 구조로 유지하세요.
-
-## 로컬 개발 서버
-
-Node.js 18.18 이상이 설치되어 있으면 추가 패키지를 설치할 필요가 없습니다.
+Node.js 18.18 이상. 추가 패키지 설치 없음.
 
 ```bash
-cd ojh-orbit-portfolio
 npm run dev
 ```
 
-브라우저에서 `http://127.0.0.1:4173`을 여세요.
-포트를 바꾸려면 `npm run dev -- --port 5173`을 사용하세요.
-`server.mjs`는 로컬 개발용입니다. 공개 서버로 운영하기 위한 보안·배포 구성은 포함하지 않습니다.
+브라우저에서 `http://127.0.0.1:4173`. ES 모듈과 importmap을 쓰기 때문에 `file://`로 직접 열면 3D 씬이 뜨지 않습니다 — 로컬 서버나 GitHub Pages로 여세요.
 
-## 구현된 동작
+## 배포
 
-- 마우스 패럴랙스, 행성 부유, 궤도 위 광점 애니메이션.
-- 행성 선택 시 해당 분야의 프로젝트로 필터링하고 목록으로 이동.
-- All work / Unity·XR / AI / Quant / Web·App / Creative 필터.
-- 카드에서 상세 창을 열고 개발 기록을 Notion에서 확인.
-- Esc·닫기 버튼·바깥 클릭으로 상세 창 종료, 키보드 포커스 순환 및 복귀.
-- 모바일 메뉴, 화면 폭에 따라 바뀌는 프로젝트 그리드.
-- About·Skills·Contact 섹션, GitHub·Notion·메일 링크, 이메일 복사와 실패 시 대체 안내.
-- 모션 일시정지·재생. 시스템의 모션 감소 설정을 우선 적용.
-- 화면 밖·비활성 탭·상세 창 뒤에서 애니메이션 정지. Canvas 최대 30fps, 기기 픽셀 비율 상한.
+`main` 브랜치를 GitHub Pages(root)에서 서빙합니다. `git push origin main` 후 1~2분 내 반영.
 
-## 현재 버전의 범위
-
-이 버전의 입체감은 **시안 이미지의 개별 레이어 + CSS 패럴랙스 + Canvas 궤도**로 구현했습니다.
-실제 GLB 캐릭터·행성 모델을 돌리는 Three.js/WebGL 3D 장면은 아닙니다. 텍스트, 버튼, 카드, 필터, 창은 편집 가능한 실제 DOM UI입니다.
-
-Notion은 **실제 문서 링크**로 연결되어 있습니다. Notion API를 통한 자동 동기화, CMS 백엔드, 로그인, 분석 추적, 메시지 전송 서버는 없습니다.
-Notion 문서의 공개 여부와 비로그인 방문자의 접근은 별도로 확인해야 합니다. 로그인 없이 열리는지까지 검증한 것은 아닙니다.
-웹 호스팅 배포·도메인 연결·GitHub 저장소 변경은 수행하지 않았습니다.
-
-카드 이미지는 승인된 시안에서 분리한 **콘셉트 아트**이며 실제 프로젝트 스크린샷이 아닙니다. 각 카드와 상세 창에도 구분을 표시했습니다.
-실제 스크린샷이 준비되면 `assets/project-*.webp`를 교체하고 설명 문구를 조정할 수 있습니다.
-임의의 개발 경력 연수, 성과 숫자, 매매 수익률은 넣지 않았습니다.
-
-## 내용 수정
-
-`config.js`에서 이름·이메일·링크와 프로젝트별 데이터를 수정하세요.
-`projects`의 `id`는 중복 없이 유지하고 `filters`에는 `unity`, `ai`, `quant`, `web`, `creative`를 사용합니다.
-카드 노출 순서는 `projects` 배열 순서입니다. 데이터는 안전하게 텍스트 노드로 렌더링됩니다.
+## 구조
 
 ```
-index.html             페이지 구조
-styles.css             레이아웃·반응형·상태 스타일
-config.js              프로필·프로젝트 데이터·Notion 주소
-app.js                 필터·상세 창·접근성·Canvas 동작
-assets/                개별 이미지와 SVG 아이콘
-server.mjs             의존성 없는 로컬 개발 서버
-build_standalone.py    HTML 단일 파일 내보내기
-SOURCES.md             콘텐츠·이미지의 출처와 범위
-design-qa.md           시각 검수 및 제한 사항
+index.html       페이지 구조 (히어로 + 프로젝트 + About/Skills/Contact + 상세 dialog)
+styles.css       레이아웃·반응형·상태 스타일
+config.js        프로필·프로젝트 데이터·Notion 주소 (내용 수정은 여기서)
+app.js           필터·상세 창·모션 설정·접근성 (의존성 없음)
+hero3d.js        Three.js 히어로 씬: 큐브 5개, Edit/Play 전환, 디버그 오버레이
+vendor/          three.js r170 + postprocessing 애드온 (MIT, vendor/LICENSE.three.txt)
+assets/          프로젝트 카드 이미지(콘셉트 아트)·SVG 아이콘
+tests/           Playwright 스모크 테스트 (dev 서버 대상)
 ```
 
-## 수정한 내용을 단일 HTML로 내보내기
+### 히어로 씬 동작
 
-Python 3가 설치되어 있으면 외부 라이브러리 없이 실행할 수 있습니다.
-
-```bash
-python build_standalone.py OJH_Interactive_Portfolio.html
-```
-
-생성된 HTML에는 이미지와 아이콘이 함께 들어갑니다. 스타일·구조·데이터를 수정한 뒤에는 이 명령을 다시 실행해야 수정사항이 반영됩니다.
+- 큐브 ↔ 프로젝트 매핑은 `hero3d.js`의 `BUILDERS`/`TONES`가 `config.js`의 `projects[].id`를 참조합니다.
+- 큐브 클릭 → `ojh:open-project` 이벤트 → `app.js`가 기존 상세 창을 엶. 창이 닫히면 `ojh:project-closed`로 카메라 복귀.
+- 헤더의 모션 토글은 `window.OJH_HERO.setRunning()`으로 씬 시뮬레이션도 함께 멈춥니다. `prefers-reduced-motion`이면 전환 애니메이션 없이 바로 PLAY 상태.
+- 성능: DPR 상한 1.5, 700px 미만에서는 블룸 비활성, 탭이 숨겨지면 렌더 스킵. 물고기 64마리는 InstancedMesh 1 드로우콜.
+- 큐브 안 오브젝트는 전부 프로시저럴 지오메트리(외부 3D 에셋 없음).
 
 ## 검수
 
-`tests/test-results.json`에 실행 결과가 들어 있습니다.
-320, 360, 390, 430, 600, 768, 820, 1024, 1280, 1440, 1536, 1920px의 12개 뷰포트에서 가로 넘침을 확인했습니다.
-프로젝트 필터, 행성 클릭, 상세 창, 키보드 이동, 모바일 메뉴, 복사 안내, 모션 정지·재생, 모션 감소 설정을 검증했습니다.
-
-실행 환경의 Chromium은 로컬 URL·파일 URL 탐색이 제한되어 있어, **완성된 독립 HTML 전체를 Chromium DOM에 직접 로딩해** 렌더링과 인터랙션을 검수했습니다.
-실제 Android·iOS 기기, Safari, 공개 도메인 배포, 외부 Notion 문서의 비로그인 접근, 다른 앱으로 전달되는 OS 클립보드 내용은 별도 실기기 검증이 필요합니다.
-실제 브라우저 렌더링을 확인했지만, 이 범위를 넘어 검증했다고 주장하지 않습니다.
-
-소스 문법 검사:
-
 ```bash
-npm run check
+npm run check                      # 문법 검사
+python tests/smoke_test.py         # Playwright + Chromium(WebGL) 필요, dev 서버 실행 중이어야 함
 ```
 
-선택적인 자동 검수에는 Python Playwright와 Chromium이 필요합니다. 브라우저 경로는 `CHROMIUM_PATH` 환경 변수로 지정할 수 있습니다.
+## 보안·라이선스
 
-```bash
-python tests/smoke_test.py OJH_Interactive_Portfolio.html
-```
-
-## 보안·배포 주의
-
-현재 파일에는 API 키·로그인 토큰·Notion 통합 키가 없습니다. 토큰을 `config.js`나 HTML에 추가하지 마세요.
-추후 자동 동기화를 붙일 때는 공개 프론트엔드와 서버 전용 코드를 분리하고, 비밀 키는 서버의 환경 변수에만 저장해야 합니다.
-아이콘 라이선스는 `assets/icons/LICENSE.txt`와 `NOTICE.md`를 참고하세요. 폰트 파일은 포함하지 않았습니다.
+API 키·토큰 없음. 노션 링크는 공개 게시 주소로 유지해야 비로그인 방문자가 열 수 있습니다.
+아이콘: Font Awesome Free (CC BY 4.0) — `assets/icons/LICENSE.txt`, `NOTICE.md`. three.js: MIT.

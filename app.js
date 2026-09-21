@@ -82,7 +82,6 @@
       assignLink(element, raw, key === 'email');
     });
     query('#email-text').textContent = config.email;
-    queries('.universe img').forEach(image => { image.draggable = false; });
   }
   function createCard(project) {
     const card = makeElement('button', 'project-card');
@@ -144,8 +143,7 @@
     if (total) total.textContent = String(config.projects.length).padStart(2, '0');
     queries('[data-filter]').forEach(button => {
       button.addEventListener('click', () => {
-        const fromPlanet = button.classList.contains('planet') || button.classList.contains('core-planet');
-        try { filterProjects(button.dataset.filter, fromPlanet); }
+        try { filterProjects(button.dataset.filter, false); }
         catch (error) { failSoft('프로젝트 목록', error); }
       });
     });
@@ -190,6 +188,7 @@
   function finishClose() {
     document.body.classList.remove('modal-open'); state.modal = null;
     if (state.lastFocus && state.lastFocus.isConnected) state.lastFocus.focus({preventScroll: true});
+    window.dispatchEvent(new CustomEvent('ojh:project-closed'));
     syncAnimation();
   }
   function setupDialog() {
@@ -280,8 +279,8 @@
   function syncAnimation() {
     const running = state.motion && state.heroVisible && !document.hidden && !state.modal;
     animationControllers.forEach(controller => controller.setRunning(running));
-    // CSS animations are also stopped when offscreen, in another tab, or behind a modal.
-    queries('.core-float, .planet-visual').forEach(element => { element.style.animationPlayState = running ? 'running' : 'paused'; });
+    // The WebGL hero (hero3d.js) follows the same motion switch; it keeps rendering hover/focus but stops simulating.
+    if (window.OJH_HERO) window.OJH_HERO.setRunning(state.motion && !document.hidden);
   }
   function setupMotion() {
     mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -347,47 +346,10 @@
       });
     });
   }
-  function setupOrbits() {
-    setupCanvas(query('#orbit-canvas'), (context, {width, height}, time) => {
-      const mobile = window.innerWidth <= 700;
-      const wide = window.innerWidth > 1200;
-      const cx = width * (mobile ? .5 : wide ? .44 : .48), cy = height * (mobile ? .45 : wide ? .52 : .47);
-      const paths = mobile ? [[.38,.19,-.34],[.37,.14,.43],[.17,.365,-.10]] : [[.34,.19,-.36],[.32,.165,.40],[.18,.38,-.20]];
-      const hues = ['119,152,195', '113,145,190', '135,143,206'];
-      paths.forEach((orbit, index) => {
-        const rx = width * orbit[0], ry = height * orbit[1], rotation = orbit[2] + Math.sin(time * .04 + index) * .025;
-        context.save(); context.translate(cx, cy); context.rotate(rotation);
-        context.beginPath(); context.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        context.strokeStyle = `rgba(${hues[index]},${index === 2 ? .17 : .29})`; context.lineWidth = .65; context.stroke();
-        for (let particle = 0; particle < 3; particle++) {
-          const angle = time * (.075 + index * .014) + particle * 2.0944 + index * .8;
-          const x = rx * Math.cos(angle), y = ry * Math.sin(angle);
-          context.beginPath(); context.fillStyle = 'rgba(118,171,243,.10)'; context.arc(x, y, 5, 0, Math.PI * 2); context.fill();
-          context.beginPath(); context.fillStyle = 'rgba(178,213,255,.9)'; context.arc(x, y, 1.25, 0, Math.PI * 2); context.fill();
-        }
-        context.restore();
-      });
-    });
-    const universe = query('#universe');
-    let pointerFrame = 0, pointerX = 0, pointerY = 0;
-    universe.addEventListener('pointermove', event => {
-      if (!state.motion || event.pointerType !== 'mouse') return;
-      const rect = universe.getBoundingClientRect();
-      pointerX = (event.clientX - rect.left) / rect.width * 2 - 1;
-      pointerY = (event.clientY - rect.top) / rect.height * 2 - 1;
-      if (!pointerFrame) pointerFrame = requestAnimationFrame(() => {
-        universe.style.setProperty('--px', pointerX.toFixed(3)); universe.style.setProperty('--py', pointerY.toFixed(3)); pointerFrame = 0;
-      });
-    }, {passive: true});
-    universe.addEventListener('pointerleave', () => {
-      if (pointerFrame) cancelAnimationFrame(pointerFrame); pointerFrame = 0;
-      universe.style.setProperty('--px', '0'); universe.style.setProperty('--py', '0');
-    });
-    queries('.planet').forEach(planet => {
-      const enter = () => { query('#universe-hint-text').textContent = filterNames[planet.dataset.filter] + ' — CLICK TO EXPLORE'; };
-      const leave = () => { query('#universe-hint-text').textContent = 'SELECT A WORLD. EXPLORE AN IDEA.'; };
-      planet.addEventListener('mouseenter', enter); planet.addEventListener('focus', enter);
-      planet.addEventListener('mouseleave', leave); planet.addEventListener('blur', leave);
+  function setupHeroBridge() {
+    window.addEventListener('ojh:open-project', event => {
+      const detail = event.detail || {};
+      openProject(detail.id, detail.opener);
     });
   }
   if (!config) { failSoft('포트폴리오 설정', new Error('Missing config.js')); return; }
@@ -397,7 +359,7 @@
   safeInit('탐색 메뉴', setupNavigation);
   safeInit('모션 설정', setupMotion);
   safeInit('별 배경', setupStars);
-  safeInit('궤도 애니메이션', setupOrbits);
+  safeInit('3D 씬 연동', setupHeroBridge);
   safeInit('이메일 복사', () => query('#copy-email').addEventListener('click', copyEmail));
   syncAnimation();
   window.addEventListener('pagehide', () => { animationControllers.forEach(controller => controller.setRunning(false)); });

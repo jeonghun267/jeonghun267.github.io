@@ -5,5 +5,7 @@ The installed distribution's complete license is included as `assets/icons/LICEN
 Font Awesome Free SVG icons are licensed under CC BY 4.0. The files were recolored to match this portfolio.
 Source: https://fontawesome.com/
 
+three.js (r170) and its postprocessing examples in `vendor/` are MIT licensed; see `vendor/LICENSE.three.txt`.
+
 No font binaries or webfont files are distributed in this project.
 The decorative raster assets were extracted from the approved images in this conversation, not from a third-party portfolio website.

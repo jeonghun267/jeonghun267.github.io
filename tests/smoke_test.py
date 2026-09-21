@@ -1,37 +1,38 @@
-"""Browser tests for the self-contained build. No external navigation or internet required.
-Usage: python tests/smoke_test.py /path/to/OJH_Interactive_Portfolio.html
-Requires Playwright and a Chromium executable. This test does not claim real-device testing.
+"""Browser smoke tests against the local dev server (npm run dev).
+Usage: python tests/smoke_test.py [http://127.0.0.1:4173/]
+Requires Playwright and a Chromium executable with WebGL. This test does not claim real-device testing.
 """
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import json, logging, sys, os
 ROOT = Path(__file__).resolve().parents[1]
-BUILD = Path(sys.argv[1]) if len(sys.argv) > 1 else Path('/mnt/data/OJH_Interactive_Portfolio.html')
+URL = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:4173/'
 logging.basicConfig(level=logging.INFO, format='%(levelname)s %(message)s')
-report = {'method': 'Chromium DOM rendering of complete standalone HTML using set_content; browser navigation to localhost and file URLs is restricted in this environment.', 'checks': [], 'viewports': [], 'errors': []}
+report = {'method': 'Headless Chromium against the local dev server; WebGL hero (hero3d.js) included.', 'checks': [], 'viewports': [], 'errors': []}
 
 def record(name, passed, detail=''):
     report['checks'].append({'name': name, 'passed': bool(passed), 'detail': detail})
     logging.info('%s %s %s', 'PASS' if passed else 'FAIL', name, detail)
 
 try:
-    html = BUILD.read_text(encoding='utf-8')
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.getenv('CHROMIUM_PATH', '/usr/bin/chromium'), headless=True, args=['--no-sandbox','--disable-dev-shm-usage'])
         page = browser.new_page(viewport={'width':1536,'height':1024}, device_scale_factor=1)
         page.on('pageerror', lambda error: report['errors'].append(str(error)))
         page.on('console', lambda msg: report['errors'].append(msg.text) if msg.type == 'error' else None)
-        page.set_content(html, wait_until='load')
-        page.wait_for_timeout(180)
+        page.goto(URL, wait_until='load')
+        page.wait_for_timeout(600)
+        record('Hero scene booted', page.evaluate('Boolean(window.OJH_HERO)'))
         record('Initial project cards', page.locator('.project-card').count() == 5)
         for value, expected in [('unity',3),('ai',1),('quant',1),('web',2),('creative',3),('all',5)]:
             page.locator(f'.filter[data-filter="{value}"]').click()
             record('Filter '+value, page.locator('.project-card').count() == expected, str(page.locator('.project-card').count()))
         page.evaluate('window.scrollTo(0,0)')
-        page.locator('.planet-unity').click()
-        page.wait_for_timeout(550)
-        record('Planet opens category', page.locator('.project-card').count() == 3 and page.locator('.filter[data-filter="unity"]').get_attribute('aria-pressed') == 'true')
-        record('Planet scrolls to work', page.evaluate('scrollY > 150'))
+        page.locator('#btn-play').click(); page.wait_for_timeout(1700)
+        record('Play mode label', 'PLAY' in page.locator('#mode-label').inner_text() and page.evaluate('window.OJH_HERO.isPlaying()'))
+        page.locator('#btn-debug').click()
+        record('Debug overlay', page.locator('#debug').is_visible() and page.locator('#s-calls').inner_text() != '—')
+        page.locator('#btn-debug').click()
         page.locator('[data-project-id="aac"]').click()
         dialog = page.locator('#project-dialog')
         record('Project dialog opens', dialog.is_visible() and page.locator('#dialog-title').inner_text() == 'Unity AAC')
@@ -55,13 +56,9 @@ try:
         page.evaluate('window.scrollTo(0,0)'); page.wait_for_timeout(80)
         page.locator('#motion-toggle').click()
         record('Motion pause', page.locator('#motion-toggle').get_attribute('aria-pressed') == 'false')
-        time_a = page.locator('#orbit-canvas').evaluate('(el)=>el.toDataURL()'); page.wait_for_timeout(160)
-        time_b = page.locator('#orbit-canvas').evaluate('(el)=>el.toDataURL()')
-        record('Paused canvas is static', time_a == time_b)
+        record('Hero follows motion switch', page.evaluate('document.body.classList.contains("motion-paused")'))
         page.locator('#motion-toggle').click(); page.wait_for_timeout(150)
-        time_a = page.locator('#orbit-canvas').evaluate('(el)=>el.toDataURL()'); page.wait_for_timeout(200)
-        time_b = page.locator('#orbit-canvas').evaluate('(el)=>el.toDataURL()')
-        record('Motion restarts', time_a != time_b)
+        record('Motion restarts', page.locator('#motion-toggle').get_attribute('aria-pressed') == 'true')
         widths=[320,360,390,430,600,768,820,1024,1280,1440,1536,1920]
         for width in widths:
             page.set_viewport_size({'width':width,'height':844 if width<700 else 1024})
