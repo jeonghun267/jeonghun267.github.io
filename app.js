@@ -171,6 +171,7 @@
       const tags = query('#dialog-tags'); tags.replaceChildren(...project.tags.map(tag => makeElement('span', '', tag)));
       const points = query('#dialog-points'); points.replaceChildren(...project.points.map(point => makeElement('li', '', point)));
       assignLink(query('#dialog-notion'), project.notion);
+      const video = query('#dialog-video'); video.hidden = !project.video; if (project.video) video.href = safeUrl(project.video) || '#';
       document.body.classList.add('modal-open');
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else { dialog.setAttribute('open', ''); dialog.setAttribute('role', 'dialog'); dialog.setAttribute('aria-modal', 'true'); }

@@ -48,7 +48,8 @@ window.PORTFOLIO_CONFIG = Object.freeze({
       role: 'XR 상호작용 · 씬 흐름 · 공간 연출',
       points: ['다중 씬 전환과 페이드 동기화', 'VR 이동·월드 UI 상호작용', 'URP·셰이더를 활용한 공간 연출'],
       note: '노션 포트폴리오에 기록된 범위의 소개입니다. 프로젝트별 구현 세부사항은 연결된 문서를 참고하세요.',
-      notion: 'https://app.notion.com/p/04f8e7bb5770828e9d6481d3dac5d137'
+      notion: 'https://app.notion.com/p/04f8e7bb5770828e9d6481d3dac5d137',
+      video: 'https://www.youtube.com/watch?v=oTahLEX3NXo'
     },
     {
       id: 'xbit', number: '05', title: 'XBIT', subtitle: '복잡한 Git 제출을 하나의 흐름으로',
