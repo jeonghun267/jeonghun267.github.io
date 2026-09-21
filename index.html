@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#04080d">
+  <meta name="description" content="오정훈의 인터랙티브 포트폴리오. Unity, AI, XR와 웹 기술을 연결해 아이디어를 실제 경험으로 만듭니다.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>OJH — Ideas into Real Experiences</title>
+  <link rel="icon" href="assets/orb-unity.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="config.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#projects">프로젝트 바로 보기</a>
+<canvas id="starfield" aria-hidden="true"></canvas>
+<header class="site-header">
+  <a class="brand" href="#home" aria-label="OJH 홈"><span>OJH</span><span class="brand-dot" aria-hidden="true"></span><span class="brand-line">Build a more intelligent tomorrow.</span></a>
+  <nav id="main-nav" class="main-nav" aria-label="메인 메뉴">
+    <a class="nav-link active" href="#home">Home</a><a class="nav-link" href="#projects">Projects</a><a class="nav-link" href="#about">About</a><a class="nav-link" href="#skills">Skills</a>
+  </nav>
+  <div class="header-actions">
+    <a class="contact-pill" href="#contact">Let’s talk <img class="icon" src="assets/icons/arrow-right.svg" alt="" width="14" height="14"></a>
+    <button id="motion-toggle" class="icon-button motion-toggle" type="button" aria-pressed="true" aria-label="애니메이션 일시정지" title="애니메이션 일시정지"><img class="icon motion-icon" src="assets/icons/pause.svg" alt="" width="16" height="16"></button>
+    <button id="menu-toggle" class="icon-button menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="메뉴 열기"><img class="icon" src="assets/icons/menu.svg" alt="" width="18" height="18"></button>
+  </div>
+</header>
+<main>
+  <section id="home" class="hero" aria-labelledby="hero-title">
+    <img class="distant-planet" src="assets/distant-planet.png" alt="" width="346" height="492" aria-hidden="true">
+    <div class="hero-copy">
+      <p class="eyebrow">AI × INTERACTIVE DEVELOPER</p>
+      <h1 id="hero-title">Ideas into<br><span>Real Experiences.</span></h1>
+      <p class="hero-description">AI, 3D, 그리고 사람을 연결하는<br>인터랙티브한 경험을 만듭니다.</p>
+      <div class="hero-actions"><a href="#projects" class="button button-primary">View my work <img class="icon" src="assets/icons/arrow-right.svg" alt="" width="16" height="16"></a><a href="#about" class="button button-ghost">About me</a></div>
+      <div class="focus-areas" aria-label="개발 분야"><div><strong>Unity</strong><span>Immersive worlds</span></div><div><strong>AI</strong><span>Connected intelligence</span></div><div><strong>Web</strong><span>Ideas into products</span></div></div>
+    </div>
+    <div class="universe" id="universe" aria-label="행성을 선택해서 분야별 프로젝트를 탐색하세요">
+      <div class="universe-inner" id="universe-inner">
+        <canvas id="orbit-canvas" aria-hidden="true"></canvas>
+        <button class="core-planet" type="button" data-filter="all" aria-label="전체 프로젝트 보기">
+          <span class="core-float"><img class="globe-art" src="assets/globe.png" alt="푸른 빛의 지구" width="356" height="356" fetchpriority="high"><span class="core-label"><strong>OJH</strong><span>AI × INTERACTIVE<br>DEVELOPER</span></span></span>
+        </button>
+        <button class="planet planet-ai" data-filter="ai" type="button" aria-label="AI 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-ai.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>AI AGENT</strong><span>Automate<br>Collaborate<br>Create</span></span></button>
+        <button class="planet planet-quant" data-filter="quant" type="button" aria-label="퀀트 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-quant.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>QUANT</strong><span>Data<br>Trading<br>Strategies</span></span></button>
+        <button class="planet planet-unity" data-filter="unity" type="button" aria-label="Unity·3D 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-unity.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>UNITY / 3D</strong><span>Interactive<br>Simulation<br>Metaverse</span></span></button>
+        <button class="planet planet-fullstack" data-filter="web" type="button" aria-label="웹·앱 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-fullstack.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>FULL STACK</strong><span>Build<br>Integrate<br>Scale</span></span></button>
+        <button class="planet planet-creative" data-filter="creative" type="button" aria-label="인터랙티브 콘텐츠 프로젝트 보기" aria-pressed="false"><span class="planet-visual"><img src="assets/orb-creative.png" alt="" width="120" height="120"></span><span class="planet-label"><strong>CREATIVE</strong><span>Turn ideas<br>into<br>Experiences</span></span></button>
+        <img class="terrain" src="assets/terrain.png" alt="" width="1010" height="132" aria-hidden="true">
+        <img class="observer" src="assets/observer.png" alt="" width="41" height="55" aria-hidden="true">
+      </div>
+      <div class="universe-hint"><img class="icon" src="assets/icons/mouse-pointer.svg" alt="" width="10" height="10"><span id="universe-hint-text">SELECT A WORLD. EXPLORE AN IDEA.</span></div>
+    </div>
+    <aside class="hero-aside"><a class="scroll-cue" href="#projects"><span>SCROLL TO<br><b>EXPLORE</b></span><img class="icon" src="assets/icons/arrow-down.svg" alt="" width="14" height="14"></a><blockquote><span class="quote-mark" aria-hidden="true">“</span>Technology is a tool.<br>People make it<br>meaningful.</blockquote></aside>
+  </section>
+  <section id="projects" class="projects-section page-section" aria-labelledby="projects-title">
+    <div class="section-heading"><div><p class="eyebrow"><span class="tiny-dot" aria-hidden="true"></span> SELECTED WORK</p><h2 id="projects-title">프로젝트로 증명하는 아이디어<span class="heading-period">.</span></h2><p class="section-intro">다양한 기술을 연결해, 실제로 경험할 수 있는 결과로.</p></div><a href="#projects" id="view-all" class="text-link">View all projects <img class="icon" src="assets/icons/arrow-right.svg" alt="" width="14" height="14"></a></div>
+    <div class="filter-bar"><div class="filters" role="group" aria-label="프로젝트 분야 필터"><button class="filter active" type="button" data-filter="all" aria-pressed="true">All work <span>05</span></button><button class="filter" type="button" data-filter="unity" aria-pressed="false">Unity / XR</button><button class="filter" type="button" data-filter="ai" aria-pressed="false">AI</button><button class="filter" type="button" data-filter="quant" aria-pressed="false">Quant</button><button class="filter" type="button" data-filter="web" aria-pressed="false">Web / App</button><button class="filter" type="button" data-filter="creative" aria-pressed="false">Creative</button></div><span class="result-count" id="result-count" aria-live="polite">5 projects</span></div>
+    <div class="project-grid" id="project-grid"></div>
+    <p class="art-note">카드 이미지는 시안의 콘셉트 아트입니다. 실제 구현 화면과 개발 기록은 프로젝트의 Notion 문서에서 확인하세요.</p>
+    <noscript><p class="noscript-notice">프로젝트 필터와 상세 창은 JavaScript가 필요합니다. <a href="https://app.notion.com/p/59a8e7bb577082fabbf381ca689df946">Notion에서 포트폴리오 보기</a></p></noscript>
+  </section>
+  <div class="section-divider"><span></span><p>Different technologies. One connected experience.</p><span></span></div>
+  <section id="about" class="about-section page-section" aria-labelledby="about-title">
+    <div class="about-heading"><p class="eyebrow">THE PERSON BEHIND THE WORK</p><h2 id="about-title">기술의 경계보다,<br><span>가능성의 연결을.</span></h2><a class="text-link" data-config-link="notion" target="_blank" rel="noopener noreferrer">My story on Notion <img class="icon" src="assets/icons/arrow-up-right.svg" alt="" width="14" height="14"></a></div>
+    <div class="about-body"><p class="about-lead">안녕하세요. <strong>오정훈</strong>입니다.<br>아이디어를 실제로 동작하는 경험으로 연결합니다.</p><p>Unity를 중심으로 XR 상호작용과 3D 공간을 만들고,<br class="desktop-break"> AI 모델·API·웹 기술을 연결해 사용자의 문제를 풀어갑니다.</p><div class="approach-grid"><div><span class="index-label">01 / UNDERSTAND</span><h3>문제에서 출발하고</h3><p>사용자에게 필요한 행동과 경험을 먼저 정의합니다.</p></div><div><span class="index-label">02 / CONNECT</span><h3>기술을 연결하고</h3><p>엔진·AI·데이터를 하나의 동작 흐름으로 엮습니다.</p></div><div><span class="index-label">03 / MAKE IT REAL</span><h3>동작으로 증명합니다</h3><p>구현 과정과 해결한 문제를 프로젝트에 기록합니다.</p></div></div></div>
+  </section>
+  <section id="skills" class="skills-section page-section" aria-labelledby="skills-title"><div class="section-heading"><div><p class="eyebrow">MY TOOLKIT</p><h2 id="skills-title">경험을 만드는 기술들<span class="heading-period">.</span></h2></div><p class="skills-caption">점수가 아닌, 연결하고 구현한 영역.</p></div><div class="skills-grid"><article class="skill-card"><span class="index-label">01 / REAL-TIME</span><h3>Unity & XR</h3><p>공간을 만들고, 상호작용을 설계합니다.</p><div class="tag-list"><span>Unity</span><span>C#</span><span>Meta XR SDK</span><span>OpenXR</span><span>URP</span></div></article><article class="skill-card"><span class="index-label">02 / INTELLIGENCE</span><h3>AI & Integration</h3><p>외부 모델과 엔진을 실제 흐름으로 연결합니다.</p><div class="tag-list"><span>Gemini</span><span>REST API</span><span>Android TTS</span><span>WebSocket</span></div></article><article class="skill-card"><span class="index-label">03 / INTERFACE</span><h3>Web & App</h3><p>아이디어를 사용 가능한 인터페이스로 만듭니다.</p><div class="tag-list"><span>React</span><span>TypeScript</span><span>Next.js</span><span>Flutter</span><span>.NET</span></div></article><article class="skill-card"><span class="index-label">04 / FOUNDATION</span><h3>Data & Workflow</h3><p>데이터와 개발 흐름을 구조화합니다.</p><div class="tag-list"><span>Supabase</span><span>SQLite</span><span>Git</span><span>Vitest</span></div></article></div></section>
+  <section id="contact" class="contact-section page-section" aria-labelledby="contact-title"><div><p class="eyebrow">HAVE SOMETHING IN MIND?</p><h2 id="contact-title">Let’s build<br><span>the next.</span></h2></div><div class="contact-details"><p>함께 만들고 싶은 경험이 있다면,<br>이야기를 나눠요.</p><a class="email-link" data-config-link="email"><span id="email-text">popmin07@gmail.com</span><img class="icon" src="assets/icons/arrow-up-right.svg" alt="" width="22" height="22"></a><div class="contact-links"><button id="copy-email" class="text-link" type="button"><img class="icon" src="assets/icons/copy.svg" alt="" width="14" height="14">이메일 복사</button><a class="text-link" data-config-link="github" target="_blank" rel="noopener noreferrer"><img class="icon" src="assets/icons/github.svg" alt="" width="17" height="17">GitHub</a><a class="text-link" data-config-link="notion" target="_blank" rel="noopener noreferrer">Notion <img class="icon" src="assets/icons/arrow-up-right.svg" alt="" width="13" height="13"></a></div></div></section>
+</main>
+<footer class="site-footer"><a href="#home" class="footer-brand">OJH<span> / </span>오정훈</a><p>Ideas, connected. Experiences, created.</p><a href="#home" class="back-top">Back to top <img class="icon" src="assets/icons/arrow-down.svg" alt="" width="12" height="12"></a></footer>
+<dialog id="project-dialog" class="project-dialog" aria-labelledby="dialog-title"><div class="dialog-shell"><button type="button" id="dialog-close" class="dialog-close icon-button" aria-label="프로젝트 상세 닫기"><img class="icon" src="assets/icons/x.svg" alt="" width="19" height="19"></button><div class="dialog-image"><img id="dialog-art" alt="프로젝트 분위기를 표현한 콘셉트 아트" width="780" height="309"><span>CONCEPT ART · NOT A PRODUCT SCREENSHOT</span></div><div class="dialog-body"><p class="eyebrow" id="dialog-category"></p><h2 id="dialog-title"></h2><p class="dialog-description" id="dialog-description"></p><div class="tag-list" id="dialog-tags"></div><div class="dialog-detail"><div><p class="index-label">FOCUS</p><p id="dialog-role"></p></div><div><p class="index-label">PROJECT NOTES</p><ul id="dialog-points"></ul></div></div><div class="dialog-actions"><a id="dialog-notion" class="button button-primary" target="_blank" rel="noopener noreferrer">Notion에서 개발 기록 보기 <img class="icon" src="assets/icons/arrow-up-right.svg" alt="" width="14" height="14"></a><span>공개 설정에 따라 로그인이 필요할 수 있어요.</span></div><p class="dialog-note" id="dialog-note"></p></div></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="app-error" id="app-error" role="alert" hidden></div>
+</body>
+</html>

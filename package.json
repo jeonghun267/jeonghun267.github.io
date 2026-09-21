@@ -1,0 +1,11 @@
+{
+  "name": "ojh-orbit-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An offline-capable, responsive orbital portfolio for OJH",
+  "scripts": {
+    "dev": "node server.mjs",
+    "check": "node --check app.js && node --check config.js"
+  },
+  "engines": { "node": ">=18.18.0" }
+}
