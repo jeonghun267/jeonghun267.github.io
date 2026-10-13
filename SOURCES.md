@@ -1,36 +1,38 @@
-# 콘텐츠 및 시각 출처
+# 콘텐츠와 미디어 출처
 
-## 콘텐츠 원문
+콘텐츠 기준일: 2026-10-13. 사용자가 정리한 공개 노션 페이지와 해당 저장소의 구현 기록을 기준으로 작성했습니다.
 
-2026-09-19에 연결된 사용자의 Notion에서 아래 페이지를 읽거나 해당 프로젝트의 검색 결과와 포트폴리오 본문에 연결된 설명을 확인했습니다.
-이 사이트의 데이터는 **그때 읽은 문서의 요약본**입니다. 문서 최신성과 실제 구현 상태의 독립적인 검증을 의미하지 않습니다.
+## 프로젝트 기록
 
-- 오정훈 | 포트폴리오: https://app.notion.com/p/59a8e7bb577082fabbf381ca689df946
-- Unity AAC: https://app.notion.com/p/3678e7bb5770836ebaa8811cda4984c2
-- XBIT: https://app.notion.com/p/2c18e7bb577082deaacf81f959a1d8d4
-- BlockTrade: https://app.notion.com/p/3c18e7bb577081b6b97ff2ca3a10c062
-- STILL: https://app.notion.com/p/3d48e7bb577081f4bd06ff765a08f616
-- 인체탐험 VR: https://app.notion.com/p/04f8e7bb5770828e9d6481d3dac5d137
+- [포트폴리오 메인](https://app.notion.com/p/59a8e7bb577082fabbf381ca689df946)
+- [Unity AAC](https://app.notion.com/p/3678e7bb5770836ebaa8811cda4984c2): 3인 협업 졸업작품. 전체 UI/UX, 훈련·프로필·리포트, AI·음성, 캐릭터 보정과 립싱크 담당 범위를 명시.
+- [인체탐험 VR](https://app.notion.com/p/04f8e7bb5770828e9d6481d3dac5d137): 개인 프로젝트, 실사화 개선 진행 중. [공개 코드](https://github.com/jeonghun267/HUMANBODY).
+- [STILL](https://app.notion.com/p/3d48e7bb577081f4bd06ff765a08f616): 개인 프로젝트, 콘텐츠 추가 중. 저장소는 비공개. NDI 기능을 포함하지 않음.
+- [LightOfKorea](https://app.notion.com/p/3f88e7bb5770817a9a90f414b4314c68): 개인 학습 프로젝트, ZONE 01 60초 프로토타입. [공개 코드](https://github.com/jeonghun267/LightOfKorea).
 
-본문까지 읽은 페이지는 메인 포트폴리오, Unity AAC, XBIT입니다. BlockTrade·STILL·인체탐험 VR의 세부 소개는 메인 포트폴리오의 기술별 구현 범위와 프로젝트 검색 결과를 바탕으로 요약했습니다.
+## 실제 화면과 시연
 
-### 내용의 경계
+`assets/media`의 자료는 사용자가 현재 포트폴리오에 제공한 파일입니다.
 
-AAC 원문은 기획·설계 기록 중심이며 일부 구현 기록이 미반영 상태로 적혀 있었습니다. 따라서 최신 립싱크·AI 대화가 완성되었다는 주장을 넣지 않았습니다.
-BlockTrade는 거래 수익이나 실전 안전성의 입증 사례로 소개하지 않았습니다.
-XBIT의 Git 제출 흐름·UI·데이터 구조를 소개하되 원문의 개별 보안 구현을 검증된 보안 보장으로 확대하지 않았습니다.
-이메일과 GitHub 프로필은 사용자의 메인 포트폴리오에 적힌 값을 사용했습니다.
+- `aac-cover.png`: ARTTI 시작 화면. `AAC_*_screen.jpg`: 훈련·현장·리포트의 대표 화면 3장.
+- AAC 동영상: [사용자 YouTube 시연](https://youtu.be/1W3cxmKj3GI).
+- `humanbody-cover.png`: 위의 보트·NPC 화면. `humanbody-ndi.mp4`: NDI 연동 현장 시연, 전체 62.5초.
+- `still-info.jpg` / `still-fish.jpg`: Meta Quest 실기기 캡처. `still-highlight.mp4`: 기존 수중 버전 실기기 하이라이트, 31초.
+- `lightofkorea-cover.png`: 사용자가 지정한 대표사진. `lightofkorea-opening.mp4`: 오프닝 시연, 약 50초.
+- 인체탐험·LightOfKorea 영상은 길이를 유지한 업로드용 압축본이며 사용자의 바탕화면 원본은 수정하지 않았습니다.
 
-## 시각 자산
+노션의 임시 파일 주소는 다운로드 시에만 사용했으며 저장소에는 포함하지 않습니다. 카드 이미지는 실제 프로젝트 자료입니다. 이전 콘셉트 아트 파일은 Git 이력과 함께 유지되지만 현재 프로젝트 구성에서는 사용하지 않습니다.
 
-- 기준 시안: 현재 대화에서 사용자가 제작에 동의한 두 번째 우주·행성 포트폴리오 이미지.
-- 기준 파일: `references/approved-concept.png`.
-- 지구·주변 행성·지형·작은 인물·배경 행성: 기준 시안에서 각각 분리하고, 겹쳐 있던 UI 문자·마스크 경계를 정리한 이미지.
-- 프로젝트 썸네일: 기준 시안의 콘셉트 이미지에서 추출. 실제 서비스 화면으로 주장하지 않음.
-- 텍스트·메뉴·프로젝트 필터·버튼·상세 창은 스크린샷이 아니라 HTML/CSS/JavaScript로 구현.
-- 애니메이션 궤도와 별은 런타임 Canvas 장식이며 실제 모델 기반 3D 물리 시뮬레이션이 아님.
+## 구현 범위
 
-## 사용한 외부 코드 자산
+- AAC 말하기 훈련은 편의점. 현장모드는 사진 인식·장소·문장 전달이며 AR 매장 배치로 소개하지 않습니다.
+- STILL의 로비·입장 흐름은 현재 추가 내용이며 영상은 기존 수중 체험입니다.
+- LightOfKorea의 센서 입력·다중 존·현장 nDisplay/DMX는 후속 범위입니다.
+- 웹 큐브는 프로젝트에서 영감을 받은 절차적 미니 장면이며 원본 엔진 실행 화면과 구분합니다.
+- 프로젝트의 개발 문서와 로컬 검증 기록을 실제 전시장 성능·학습 효과 보증으로 해석하지 않습니다.
 
-Font Awesome Free의 SVG 아이콘만 사용했습니다. 라이선스 원문과 저작자 표기를 함께 포함했습니다.
-외부 폰트 파일과 웹 폰트 요청은 없습니다. 시스템 글꼴에 따라 자간·획·줄바꿈에 미세한 차이가 날 수 있습니다.
+## 외부 코드·아이콘
+
+기존 Three.js와 Font Awesome 자산의 라이선스·출처는 `NOTICE.md`와 각 vendor/license 파일을 유지합니다. 이 갱신에서는 외부 디자인 스킬이나 새로운 런타임 패키지를 설치하지 않았습니다.
+
+기존 시각 시안은 사용자가 제작에 동의한 이미지이며 원본은 references/approved-concept.png에 유지합니다. 이전 콘셉트 썸네일은 이 시안에서 추출한 자료입니다.

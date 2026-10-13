@@ -1,108 +1,32 @@
-# OJH portfolio — visual and interaction QA
+# 현재 포트폴리오 확인 기록
 
-final result: passed
+콘텐츠와 확인 기준일: 2026-10-13.
 
-Scope: the delivered offline-capable frontend prototype, not a deployed service or real-device certification.
+## 이번 갱신
 
-## Evidence
+- 대표 졸업작품 AAC와 인체탐험·STILL·LightOfKorea 4개로 프로젝트와 큐브를 교체.
+- Web/App·Quant 필터와 이전 프로젝트의 소개를 현재 화면에서 제거.
+- 실제 화면·대표사진·MP4 시연, 진행 상태와 역할·기술을 반영.
+- AAC의 기여·AI·문제 해결 8줄, 대표 화면 3장과 YouTube 시연 추가.
+- 기존 Three.js 구조를 사용하고 LightOfKorea 달항아리 정원 미니 장면 추가.
+- 태블릿 너비에서는 3D 씬과 소개를 위아래로 배치해 겹침을 수정.
 
-- Source visual truth: `references/approved-concept.png`.
-- Source dimensions: 1536 × 1024 pixels.
-- Implementation: `tests/desktop-final.png`, rendered by Chromium from the complete standalone HTML.
-- Desktop viewport: 1536 × 1024 CSS px, deviceScaleFactor 1. Both captures use 1:1 density.
-- State: home, all five projects, dark appearance. Implementation capture uses reduced motion to freeze the scene; functional motion on/off was tested separately.
-- Combined full-view comparison: `tests/comparison.png` (source and implementation in the same image).
-- Combined focused-region comparison: `tests/comparison-details.png` (globe/labels and cards).
-- Additional screenshots: `tests/mobile-final.png` (390 × 844), `tests/tablet-final.png` (820 × 1180), `tests/project-dialog.png`, `tests/mobile-project-dialog.png`.
-- Full-page visual inspection also covered About, Skills, Contact, and footer.
-- Browser behavior checks: `tests/test-results.json`.
+## 실행해 확인한 항목
 
-## Findings and iteration history
+Codex의 실제 브라우저에서 로컬 개발 서버를 열어 확인했습니다.
 
-### Fixed — P2: decorative artwork escaped the viewport
+- 4개 카드, Unity 3개 / Unreal 1개 / AI 활용 3개 / 전체 4개 필터.
+- Play 제어와 4개 미니 큐브 렌더, AAC 큐브 클릭으로 상세 창 열림.
+- AAC의 기여 목록 8항목, 대표 화면 3장, YouTube 플레이어와 공개 Notion 연결.
+- 비공개 AAC·STILL 저장소의 GitHub 버튼 숨김.
+- 인체탐험 62.5초, STILL 31초, LightOfKorea 50.241초의 동영상 메타데이터와 재생 컨트롤.
+- 상세 창 닫기·Escape, 모바일 메뉴 열기/닫기.
+- 390px 모바일 상세 창의 폭 366px.
+- 320px / 390px / 820px / 1280px에서 문서 가로 넘침 없음.
+- 브라우저 콘솔의 앱 오류 없음.
 
-Initial 390px rendering extended to 406px due to the terrain layer. The mobile universe now clips its decorative overflow without hiding planet labels.
-A subsequent automated boundary pass found 5px overflow at 320px and 27–30px at tablet widths. The compact-phone distant-planet inset and tablet terrain width were corrected.
-The final browser pass reports no horizontal overflow at all 12 tested widths: 320, 360, 390, 430, 600, 768, 820, 1024, 1280, 1440, 1536, 1920px.
+Node 문법 검사 대상은 app.js, config.js, hero3d.js, server.mjs입니다. Python 회귀 검사 파일은 현재 프로젝트의 기대값으로 수정했습니다. 이번 실행에서는 해당 스크립트를 별도로 실행하지 않고 브라우저 조작으로 위 항목을 확인했습니다.
 
-### Fixed — P2: source lettering and duplicate silhouette in extracted art
+## 확인 범위
 
-The first compositing pass retained faint source labels in the globe/node/background masks and a duplicate observer. Those regions were cleaned and the observer was separated from the terrain and globe.
-The rocky skyline mask was revised to remove a visible blue strip. Large background inpainting regions were replaced with smaller lettering masks to preserve planet texture.
-Post-fix evidence: the full-view and focused comparisons listed above.
-
-### Fixed — P2: first-fold density and undersized card type
-
-The initial hero pushed project cards below the intended desktop first fold. The desktop header, hero height, globe/node positions, and filter spacing were adjusted. Card title, description, filter, and node-label font sizes were increased.
-All five complete project cards now appear in the 1536 × 1024 capture. The additional real filter row is an intentional functional addition, not a source element.
-
-## Required fidelity surfaces
-
-### Fonts and typography
-
-Editable UI text follows the source's sans-serif display hierarchy and restrained tracking. The two-line hero heading, narrow uppercase labels, and project hierarchy are retained.
-System font fallbacks are used; no font binaries are included. Exact glyph metrics and headline weight can differ from the generated reference and between operating systems. This is an accepted P3 limitation, not a pixel-perfect font match claim.
-
-### Spacing and layout rhythm
-
-Desktop preserves left introduction, right orbital scene, side quote, and a five-column project grid. The last capture was checked against the source at equal viewport and density.
-At narrower widths the scene, navigation, and project grid reflow rather than scaling the desktop screenshot. No persistent control or label is clipped in the inspected mobile/tablet captures.
-Below-fold sections are newly implemented extensions because the reference only supplied a homepage first fold.
-
-### Colors and visual tokens
-
-The near-black background, pale blue/lavender typography, cool white primary action, blue globe, and five colored orbital nodes preserve the selected direction.
-The composed background is intentionally cleaner/darker than the original flattened image. Hover, focus, selected filter, and modal states are independently styled.
-
-### Image quality and asset fidelity
-
-Major decorative subjects are raster assets extracted from the approved render, not CSS/SVG approximations. Mask artifacts identified in earlier passes were corrected.
-The globe and nodes are 2.5D composited imagery; the animated paths are Canvas ornamentation, not a real 3D mesh renderer.
-Project thumbnail imagery is explicitly labeled concept art, not product screenshots. The two VR projects currently reuse related concept imagery; replacing it with real project captures is a P3 content-polish item.
-Font Awesome SVG icons are used with the original license included.
-
-### Copy and content
-
-Fictional experience counts and performance metrics in the concept were removed. Profile and project links use the user's connected Notion portfolio.
-Cards were renamed to actual listed projects. AAC completion and trading performance were not inferred from the concept image.
-The immutable source snapshot and content-read boundaries are documented in `SOURCES.md`.
-
-## Primary interactions checked
-
-- Every category filter and reset to all five cards.
-- Planet selection filters work and scrolls to the project section.
-- Project details, tags, focus area, notes, and configured Notion target.
-- Modal close button, Escape, backdrop, focus wrap, and focus return.
-- Mobile menu opening and closing after anchor navigation.
-- Email mailto target and clipboard-success feedback/fallback path.
-- Motion pause, unchanged Canvas while paused, restart, and OS reduced-motion preference.
-- Image decoding and JavaScript/browser-console errors.
-
-All assertions in the final test-results file passed. No JavaScript or console errors were recorded in that run.
-
-## Test limitations
-
-Chromium in this environment blocks navigation to localhost and file URLs. The completed self-contained HTML was instead rendered directly in Chromium with `set_content`, including real CSS layout, embedded assets, JavaScript, clicks, keyboard events, dialogs, and screenshots. Browser policy was not modified.
-This verifies the rendered frontend but not the deployment transport, real-device hardware performance, Safari behavior, external Notion permissions, or the OS clipboard contents received by another application.
-No public deployment, domain connection, backend, or Notion API synchronization has been performed.
-
-## Follow-up polish
-
-- Replace decorative project thumbnails with project-specific production screenshots.
-- An actual 3D-model renderer would be a separate implementation phase.
-- Check real Android/iOS browsers and public Notion permissions before publishing.
-
-## Implementation checklist
-
-- [x] Selected visual retained as reference.
-- [x] Interactive editable HTML/CSS/JavaScript implemented.
-- [x] Initial P2 visual and responsive issues fixed and recaptured.
-- [x] Full-view and focused source/implementation comparisons inspected.
-- [x] Twelve viewport widths checked for overflow.
-- [x] Primary interactions and error console checked.
-- [x] Standalone HTML, source, assets, licenses, and documentation packaged.
-
-
-## 2026-09-21 — 히어로 교체
-
-우주·행성 이미지 레이어 히어로를 Three.js 디오라마 큐브 씬(`hero3d.js`)으로 교체했습니다. 위 항목 중 행성·궤도·패럴랙스 관련 검수는 더 이상 해당하지 않습니다. 새 히어로는 1440·375px에서 EDIT→PLAY 전환, 호버 라벨, 큐브 클릭→상세 창→복귀, DEBUG 오버레이, 모바일 세로 배치를 확인했습니다.
+데스크톱 브라우저와 브라우저의 화면 크기 변경으로 확인했습니다. 실제 모바일 기기·VR 헤드셋·Unreal 프로젝트를 이번 사이트 갱신 과정에서 실행한 것은 아닙니다. 원본 엔진 프로젝트의 구현·검증 기록은 Notion과 각 저장소에서 구분해 소개합니다.

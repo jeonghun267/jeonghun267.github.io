@@ -11,8 +11,8 @@
   const config = window.PORTFOLIO_CONFIG;
   const query = (selector, root = document) => root.querySelector(selector);
   const queries = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const filters = new Set(['all', 'ai', 'unity', 'quant', 'web', 'creative']);
-  const filterNames = {all: 'ALL WORLDS', ai: 'AI & INTEGRATION', unity: 'UNITY / XR', quant: 'QUANT & DATA', web: 'WEB / APP', creative: 'INTERACTIVE EXPERIENCES'};
+  const filters = new Set(['all', 'unity', 'unreal', 'ai']);
+  const filterNames = {all: 'ALL WORK', unity: 'UNITY / XR', unreal: 'UNREAL / MEDIA ART', ai: 'AI IN PRACTICE'};
   const state = { filter: 'all', motion: true, heroVisible: true, modal: null, lastFocus: null };
   const animationControllers = [];
   let toastTimeout;
@@ -84,27 +84,30 @@
     query('#email-text').textContent = config.email;
   }
   function createCard(project) {
-    const card = makeElement('button', 'project-card');
+    const card = makeElement('button', 'project-card' + (project.featured ? ' is-featured' : ''));
     card.type = 'button'; card.dataset.projectId = project.id;
     card.setAttribute('aria-label', project.title + ' 프로젝트 상세 보기');
     card.setAttribute('aria-haspopup', 'dialog');
     const header = makeElement('div', 'project-card-head');
     const titleLine = makeElement('div', 'project-title-line');
     titleLine.append(makeElement('span', 'project-number', project.number), makeElement('h3', '', project.title));
-    header.append(titleLine, makeElement('p', 'project-summary', project.subtitle));
+    const meta = makeElement('div', 'project-meta');
+    meta.append(makeElement('span', project.featured ? 'featured-label' : 'project-engine', project.featured ? '대표 졸업작품' : project.category.split(' · ')[0]), makeElement('span', '', project.type));
+    header.append(meta, titleLine, makeElement('p', 'project-summary', project.subtitle), makeElement('p', 'project-status', project.status));
+    if (project.featured) header.append(makeElement('p', 'featured-summary', project.description));
     const art = makeElement('div', 'card-art');
     const image = makeElement('img');
-    image.src = assetPath(project.art); image.alt = ''; image.width = 780; image.height = 309;
+    image.src = assetPath(project.art); image.alt = project.imageAlt; image.width = 780; image.height = 309;
     image.loading = 'lazy'; image.decoding = 'async';
     image.addEventListener('error', () => {
       logger.warn('Artwork unavailable', project.id);
       image.hidden = true;
       art.lastElementChild.textContent = 'IMAGE UNAVAILABLE';
     }, {once: true});
-    art.append(image, makeElement('span', '', 'CONCEPT ART'));
+    art.append(image, makeElement('span', '', project.artLabel));
     const footer = makeElement('div', 'project-card-footer');
     const tags = makeElement('div', 'tag-list');
-    project.tags.forEach(tag => tags.append(makeElement('span', '', tag)));
+    project.tags.slice(0, 5).forEach(tag => tags.append(makeElement('span', '', tag)));
     const arrow = makeElement('span', 'card-open'); arrow.setAttribute('aria-hidden', 'true'); arrow.append(makeIcon('arrow-up-right'));
     footer.append(tags, arrow); card.append(header, art, footer);
     return card;
@@ -152,7 +155,67 @@
       const card = event.target.closest('[data-project-id]');
       if (card) openProject(card.dataset.projectId, card);
     });
+    const sceneLinks = query('#scene-project-list');
+    config.projects.forEach(project => {
+      const link = makeElement('button', 'scene-project-link', project.number + ' · ' + project.title);
+      link.type = 'button'; link.dataset.projectId = project.id;
+      link.setAttribute('aria-haspopup', 'dialog');
+      sceneLinks.append(link);
+    });
+    sceneLinks.addEventListener('click', event => {
+      const link = event.target.closest('[data-project-id]');
+      if (link) openProject(link.dataset.projectId, link);
+    });
     renderProjects();
+  }
+  function stopDialogMedia() {
+    queries('video', query('#dialog-media')).forEach(video => video.pause());
+    queries('iframe', query('#dialog-media')).forEach(frame => frame.remove());
+  }
+  function renderProjectEvidence(project) {
+    stopDialogMedia();
+    const media = query('#dialog-media'); media.replaceChildren();
+    media.hidden = !project.clip && !project.youtubeEmbed;
+    if (project.clip) {
+      const video = makeElement('video');
+      video.controls = true; video.preload = 'metadata'; video.playsInline = true;
+      video.src = assetPath(project.clip.src); video.poster = assetPath(project.clip.poster);
+      video.setAttribute('aria-label', project.clip.caption);
+      media.append(video, makeElement('p', 'media-caption', project.clip.caption));
+    } else if (project.youtubeEmbed) {
+      const frame = makeElement('iframe');
+      frame.src = safeUrl(project.youtubeEmbed); frame.title = project.videoCaption;
+      frame.loading = 'lazy'; frame.allowFullscreen = true;
+      frame.allow = 'encrypted-media; picture-in-picture';
+      frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      media.append(frame, makeElement('p', 'media-caption', project.videoCaption));
+    }
+    const evidence = query('#dialog-summary'); evidence.replaceChildren();
+    evidence.hidden = !project.summary;
+    if (project.summary) {
+      evidence.append(makeElement('h3', '', '담당 역할 · AI 활용 · 문제와 해결'));
+      const list = makeElement('ul');
+      project.summary.forEach(([label, text]) => {
+        const item = makeElement('li');
+        item.append(makeElement('strong', '', label), makeElement('span', '', text));
+        list.append(item);
+      });
+      evidence.append(list);
+    }
+    const gallery = query('#dialog-gallery'); gallery.replaceChildren();
+    gallery.hidden = !project.screens;
+    if (project.screens) {
+      gallery.append(makeElement('h3', '', '대표 화면 3장'));
+      project.screens.forEach(screen => {
+        const figure = makeElement('figure');
+        figure.append(makeElement('h4', '', screen.title));
+        const image = makeElement('img');
+        image.src = assetPath(screen.src); image.alt = screen.title + ' 실제 구현 화면';
+        image.loading = 'lazy'; image.decoding = 'async';
+        figure.append(image, makeElement('figcaption', '', screen.caption));
+        gallery.append(figure);
+      });
+    }
   }
   function openProject(id, opener) {
     try {
@@ -167,11 +230,18 @@
       query('#dialog-role').textContent = project.role;
       query('#dialog-note').textContent = project.note;
       query('#dialog-art').src = assetPath(project.art);
-      query('#dialog-art').style.objectPosition = project.id === 'aac' ? 'center 37%' : 'center';
+      query('#dialog-art').alt = project.imageAlt;
+      query('#dialog-art').style.objectPosition = 'center';
+      query('#dialog-art-label').textContent = project.artLabel;
+      query('#dialog-status').textContent = project.type + ' · ' + project.status;
+      renderProjectEvidence(project);
       const tags = query('#dialog-tags'); tags.replaceChildren(...project.tags.map(tag => makeElement('span', '', tag)));
       const points = query('#dialog-points'); points.replaceChildren(...project.points.map(point => makeElement('li', '', point)));
       assignLink(query('#dialog-notion'), project.notion);
-      const video = query('#dialog-video'); video.hidden = !project.video; if (project.video) video.href = safeUrl(project.video) || '#';
+      const video = query('#dialog-video'); video.hidden = !project.video;
+      if (project.video) assignLink(video, project.video); else video.removeAttribute('href');
+      const source = query('#dialog-github'); source.hidden = !project.github;
+      if (project.github) assignLink(source, project.github); else source.removeAttribute('href');
       document.body.classList.add('modal-open');
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else { dialog.setAttribute('open', ''); dialog.setAttribute('role', 'dialog'); dialog.setAttribute('aria-modal', 'true'); }
@@ -187,6 +257,7 @@
     else { dialog.removeAttribute('open'); finishClose(); }
   }
   function finishClose() {
+    stopDialogMedia();
     document.body.classList.remove('modal-open'); state.modal = null;
     if (state.lastFocus && state.lastFocus.isConnected) state.lastFocus.focus({preventScroll: true});
     window.dispatchEvent(new CustomEvent('ojh:project-closed'));
@@ -205,7 +276,7 @@
       if (event.key === 'Escape' && typeof dialog.close !== 'function') closeProject();
       // Explicit focus wrap also supports browsers with partial dialog implementations.
       if (event.key !== 'Tab') return;
-      const focusables = queries('button:not([disabled]), a[href], [tabindex="0"]', dialog).filter(el => el.getClientRects().length);
+      const focusables = queries('button:not([disabled]), a[href], video[controls], iframe, [tabindex="0"]', dialog).filter(el => el.getClientRects().length);
       if (!focusables.length) return;
       const first = focusables[0], last = focusables[focusables.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
@@ -363,7 +434,7 @@
   safeInit('3D 씬 연동', setupHeroBridge);
   safeInit('이메일 복사', () => query('#copy-email').addEventListener('click', copyEmail));
   syncAnimation();
-  window.addEventListener('pagehide', () => { animationControllers.forEach(controller => controller.setRunning(false)); });
+  window.addEventListener('pagehide', () => { stopDialogMedia(); animationControllers.forEach(controller => controller.setRunning(false)); });
   window.addEventListener('pageshow', syncAnimation);
   logger.info('Portfolio ready. ' + config.projects.length + ' project notes loaded; no remote API requests.');
 })();

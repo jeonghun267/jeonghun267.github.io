@@ -16,15 +16,15 @@ def record(name, passed, detail=''):
 
 try:
     with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=os.getenv('CHROMIUM_PATH', '/usr/bin/chromium'), headless=True, args=['--no-sandbox','--disable-dev-shm-usage'])
+        browser = p.chromium.launch(executable_path=os.getenv('CHROMIUM_PATH', p.chromium.executable_path), headless=True, args=['--no-sandbox','--disable-dev-shm-usage'])
         page = browser.new_page(viewport={'width':1536,'height':1024}, device_scale_factor=1)
         page.on('pageerror', lambda error: report['errors'].append(str(error)))
         page.on('console', lambda msg: report['errors'].append(msg.text) if msg.type == 'error' else None)
         page.goto(URL, wait_until='load')
         page.wait_for_timeout(600)
         record('Hero scene booted', page.evaluate('Boolean(window.OJH_HERO)'))
-        record('Initial project cards', page.locator('.project-card').count() == 5)
-        for value, expected in [('unity',3),('ai',1),('quant',1),('web',2),('creative',3),('all',5)]:
+        record('Initial project cards', page.locator('.project-card').count() == 4)
+        for value, expected in [('unity',3),('unreal',1),('ai',3),('all',4)]:
             page.locator(f'.filter[data-filter="{value}"]').click()
             record('Filter '+value, page.locator('.project-card').count() == expected, str(page.locator('.project-card').count()))
         page.evaluate('window.scrollTo(0,0)')
@@ -35,12 +35,12 @@ try:
         page.locator('#btn-debug').click()
         page.locator('[data-project-id="aac"]').click()
         dialog = page.locator('#project-dialog')
-        record('Project dialog opens', dialog.is_visible() and page.locator('#dialog-title').inner_text() == 'Unity AAC')
+        record('Project dialog opens', dialog.is_visible() and page.locator('#dialog-title').inner_text() == '아르띠 · Unity AAC')
         record('Real Notion target', page.locator('#dialog-notion').get_attribute('href') == 'https://app.notion.com/p/3678e7bb5770836ebaa8811cda4984c2')
-        record('Modal notes and tags', page.locator('#dialog-points li').count() == 3 and page.locator('#dialog-tags span').count() == 3)
+        record('Modal notes and tags', page.locator('#dialog-points li').count() == 4 and page.locator('#dialog-tags span').count() == 8)
         record('Modal initial focus', page.evaluate('document.activeElement.id') == 'dialog-close')
         page.keyboard.press('Shift+Tab')
-        record('Modal keyboard focus wrap', page.evaluate('document.activeElement.id') == 'dialog-notion')
+        record('Modal keyboard focus wrap', page.evaluate('document.activeElement.id') == 'dialog-video')
         page.screenshot(path=str(ROOT/'tests/project-dialog.png'))
         page.keyboard.press('Escape')
         record('Escape closes dialog and restores focus', not dialog.is_visible() and page.evaluate('document.activeElement.dataset.projectId') == 'aac')
@@ -73,7 +73,7 @@ try:
         record('Mobile menu opens',page.locator('#main-nav').is_visible() and page.locator('#menu-toggle').get_attribute('aria-expanded')=='true')
         page.locator('#main-nav a[href="#projects"]').click(); page.wait_for_timeout(500)
         record('Mobile menu closes after navigation',not page.locator('#main-nav').is_visible())
-        page.locator('[data-project-id="block"]').click()
+        page.locator('[data-project-id="lightofkorea"]').click()
         record('Mobile project dialog fits',dialog.is_visible() and dialog.bounding_box()['width']<=390)
         page.screenshot(path=str(ROOT/'tests/mobile-project-dialog.png'))
         page.keyboard.press('Escape')
@@ -85,12 +85,12 @@ try:
         page.emulate_media(reduced_motion='reduce')
         page.wait_for_timeout(80)
         record('OS reduced-motion preference',page.locator('#motion-toggle').get_attribute('aria-pressed')=='false' and page.locator('#motion-toggle').is_disabled())
-        record('CSS reduced-motion preference',page.locator('.core-float').evaluate('(el)=>getComputedStyle(el).animationName')=='none')
+        record('CSS reduced-motion preference',page.locator('.hero-copy').evaluate('(el)=>getComputedStyle(el).transitionDuration')=='0s')
         page.close()
         # Fresh pages avoid inherited scrolling and produce reproducible final captures.
         for label,width,height in [('desktop',1536,1024),('mobile',390,844),('tablet',820,1180)]:
             shot=browser.new_page(viewport={'width':width,'height':height},device_scale_factor=1,reduced_motion='reduce')
-            shot.set_content(html,wait_until='load')
+            shot.goto(URL,wait_until='load')
             shot.evaluate("[...document.images].forEach(img=>img.loading='eager')")
             shot.wait_for_timeout(160)
             shot.screenshot(path=str(ROOT/f'tests/{label}-final.png'))
