@@ -114,3 +114,8 @@
 @media(max-width:700px){.scene-project-list{width:100%;grid-template-columns:1fr 1fr}}
 
 @media(min-width:701px) and (max-width:980px){.hero3d{height:auto;display:flex;flex-direction:column;overflow:visible;border-radius:0}#stage{position:relative;height:480px;order:0;border-radius:16px}.toolbar{position:relative;top:auto;left:auto;transform:none;order:1;align-self:center;margin-top:-24px}.hero-copy{position:static;width:100%;padding:28px 0 20px;order:3;text-align:center}.hero-copy.dim{opacity:1;transform:none}.hero-copy.dim a,.hero-copy.dim button{pointer-events:auto}.hero-actions,.focus-areas{justify-content:center}.scene-project-list{position:relative;order:2;right:auto;bottom:auto;width:100%;margin-top:15px}.gizmo-note,.hero-aside{display:none}}
+
+/* Three companion projects fill the row below the featured AAC card. */
+.project-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:700px){.project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.project-grid{grid-template-columns:1fr}}
