@@ -4,24 +4,23 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-/* OJH hero scene — five diorama cubes, Unity-style Edit/Play toolbar, debug overlay.
+/* OJH hero scene — four diorama cubes, Unity-style Edit/Play toolbar, debug overlay.
    Content comes from config.js (window.PORTFOLIO_CONFIG). Clicking a cube asks app.js to open
    the project dialog via the 'ojh:open-project' event; app.js reports back with 'ojh:project-closed'.
    Rendering is capped by devicePixelRatio 1.5, bloom is skipped on narrow screens, and everything
    idles when app.js says motion is off (window.OJH_HERO.setRunning). */
 /* ---------- data ---------- */
 const CONFIG = window.PORTFOLIO_CONFIG || { projects: [] };
-const BUILDERS = { still:'aquarium', humanbody:'body', aac:'store', block:'trading', xbit:'git' };
-const TONES = { still:0x5aa9ff, humanbody:0xff7ab8, aac:0xffb35a, block:0x5ee0b0, xbit:0xb7a6ff };
-const ORDER = ['still', 'humanbody', 'aac', 'block', 'xbit'];
+const BUILDERS = { aac:'store', humanbody:'body', still:'aquarium', lightofkorea:'moonGarden' };
+const TONES = { aac:0xb7a6ff, humanbody:0xff7ab8, still:0x5aa9ff, lightofkorea:0xd7dfef };
+const ORDER = ['aac', 'humanbody', 'still', 'lightofkorea'];
 const PROJECTS = ORDER.map(id => CONFIG.projects.find(p => p.id === id)).filter(Boolean)
   .map(p => ({ id:p.id, title:p.title, field:p.category, tone:TONES[p.id], builder:BUILDERS[p.id] }));
-const LAYOUT = [ // x, y, z, scale — right-side cluster, hero copy sits on the left
-  [ 0.0,  0.15,  0.0, 1.0],
-  [-2.35, 1.25, -0.9, 0.82],
-  [ 2.45, 1.15, -0.9, 0.82],
-  [-2.05,-1.45, -0.5, 0.86],
-  [ 2.25,-1.55, -0.5, 0.86],
+const LAYOUT = [
+  [0, .10, .1, 1.07],
+  [-2.25, 1.12, -.8, .78],
+  [2.25, 1.12, -.8, .78],
+  [0, -1.70, -.4, .85],
 ];
 
 /* ---------- renderer / scene ---------- */
@@ -184,49 +183,58 @@ function buildStore(root, p) {
   };
 }
 
-/* 04 BlockTrade — candles + orbiting condition blocks */
-function buildTrading(root, p) {
-  const n = 16, candles = []; let val = 0;
-  const base = new THREE.Mesh(new THREE.BoxGeometry(S * .9, .03, .5), M(0x111a2b, { emissive:0x1a2c48, emissiveIntensity:.4 })); base.position.y = -H + .2; root.add(track(base));
-  for (let k = 0; k < n; k++) { const up = Math.random() > .45, d = (Math.random() * .12 + .03) * (up ? 1 : -1); const o = val; val += d; const c = { o, c:val, up };
-    const body = new THREE.Mesh(new THREE.BoxGeometry(.05, 1, .05), M(up ? 0x35d39a : 0xff5f7e, { emissive:up ? 0x0f7a55 : 0x8a1a35, emissiveIntensity:.6 }));
-    const wick = new THREE.Mesh(new THREE.BoxGeometry(.012, 1, .012), M(0xcfd8ea)); root.add(track(body, { noEdges:true })); root.add(track(wick, { noEdges:true })); c.body = body; c.wick = wick; candles.push(c); }
-  const blocks = [];
-  for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.BoxGeometry(.16, .1, .16), M([0x5ee0b0,0x8ecae6,0xffd166,0xb7a6ff][k], { emissiveIntensity:.5, emissive:[0x5ee0b0,0x8ecae6,0xffd166,0xb7a6ff][k], roughness:.3 })); root.add(track(b)); blocks.push(b); }
-  let timer = 0;
-  const layout = () => { const lo = Math.min(...candles.map(c => Math.min(c.o, c.c))), hi = Math.max(...candles.map(c => Math.max(c.o, c.c))), span = Math.max(hi - lo, .4);
-    candles.forEach((c, k) => { const x = -S * .42 + k * (S * .84 / (n - 1)); const y0 = -H + .3 + (c.o - lo) / span * .6, y1 = -H + .3 + (c.c - lo) / span * .6; const h = Math.max(Math.abs(y1 - y0), .012);
-      c.body.position.set(x, (y0 + y1) / 2, 0); c.body.scale.y = h; c.wick.position.set(x, (y0 + y1) / 2, 0); c.wick.scale.y = h + .08;
-      c.body.userData.solid.color.set(c.c >= c.o ? 0x35d39a : 0xff5f7e); c.body.userData.solid.emissive.set(c.c >= c.o ? 0x0f7a55 : 0x8a1a35); }); };
-  layout();
-  return (t, dt, playing) => {
-    timer += dt; const last = candles[n - 1]; last.c += Math.sin(t * 7) * dt * .08 + (Math.random() - .5) * dt * .2;
-    if (timer > 1.1) { timer = 0; const first = candles.shift(); first.o = last.c; first.c = last.c + (Math.random() - .45) * .18; candles.push(first); }
-    layout();
-    blocks.forEach((b, k) => { const a = t * .6 + k * Math.PI / 2; b.position.set(Math.cos(a) * .48, .18 + Math.sin(t * 1.5 + k) * .08, Math.sin(a) * .48); b.rotation.y = a; b.rotation.x = Math.sin(t + k) * .3; });
+/* LightOfKorea — a small moon-jar garden, inspired by the Unreal prototype. */
+function buildMoonGarden(root, p) {
+  const profile = [[.18,0],[.24,.10],[.34,.25],[.40,.50],[.36,.75],[.25,.94],[.20,1.01],[.22,1.05]]
+    .map(([r,y]) => new THREE.Vector2(r,y));
+  const ceramic = M(0xf3ece0, {roughness:.34, metalness:.04, emissive:0x151a2b, emissiveIntensity:.2});
+  const jar = new THREE.Mesh(new THREE.LatheGeometry(profile, 40), ceramic);
+  jar.position.set(-.12,-H+.12,-.16); root.add(track(jar, {noEdges:true}));
+  // Ink branches sit on the front face of the miniature vessel.
+  for (const side of [-1,1]) {
+    const points = [new THREE.Vector3(side*.28,-.38,.15),new THREE.Vector3(side*.19,-.18,.23),new THREE.Vector3(side*.24,.03,.21),new THREE.Vector3(side*.12,.18,.16)];
+    const branch = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),16,.007,4,false), M(0x293b59));
+    branch.position.x=-.12; root.add(track(branch,{noEdges:true}));
+    for (let k=0;k<3;k++) {
+      const flower = new THREE.Mesh(new THREE.SphereGeometry(.018,5,4),M(0x8898b5));
+      flower.position.copy(points[k+1]).add(new THREE.Vector3(-.12,0,.01)); root.add(track(flower,{noEdges:true}));
+    }
+  }
+  const mirror = new THREE.Mesh(new THREE.BoxGeometry(1.4,.025,1.4),M(0x15243c,{metalness:.7,roughness:.16}));
+  mirror.position.y=-H+.095; root.add(track(mirror));
+  // Pavilion and three soft light trees.
+  for (const x of [.34,.63]) for (const z of [.10,.40]) {
+    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(.014,.018,.30,5),M(0x8c6033));
+    pillar.position.set(x,-.49,z);root.add(track(pillar,{noEdges:true}));
+  }
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(.32,.14,4),M(0x273044));
+  roof.position.set(.485,-.26,.25);roof.rotation.y=Math.PI/4;roof.scale.z=.8;root.add(track(roof));
+  const petals=[];
+  for (const [x,z] of [[-.57,-.36],[.52,-.49],[-.58,.36]]) {
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(.010,.018,.63,5),M(0x3a4354));
+    stem.position.set(x,-.35,z);root.add(track(stem,{noEdges:true}));
+    for (let k=0;k<3;k++) {
+      const branch = new THREE.Mesh(new THREE.CylinderGeometry(.005,.009,.25,4),M(0x3a4354));
+      branch.position.set(x+(k-1)*.06,-.12+k*.07,z);
+      branch.rotation.z=(k-1)*.6;root.add(track(branch,{noEdges:true}));
+      const glow = new THREE.Mesh(new THREE.SphereGeometry(.023,6,5),M(0xaac7ed,{emissive:0x87bbff,emissiveIntensity:1.1}));
+      glow.position.set(x+(k-1)*.13,.04+k*.035,z);root.add(track(glow,{noEdges:true}));petals.push(glow);
+    }
+  }
+  const rings=[];
+  for(let k=0;k<3;k++) {
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.20,.006,5,36),M(0x9dbbde,{emissive:0x6c9bce,emissiveIntensity:1.3,transparent:true,opacity:.7}));
+    ring.rotation.x=-Math.PI/2;ring.position.set(-.1,-H+.13,.06);root.add(track(ring,{noEdges:true}));rings.push(ring);
+  }
+  return (t,dt,playing) => {
+    const phase=(t%18)/18;
+    ceramic.emissiveIntensity=.12+Math.sin(t*.3)*.07;
+    rings.forEach((ring,k)=>{const wave=(t*.18+k/3)%1;ring.scale.setScalar(.2+wave*3);ring.userData.solid.opacity=playing?(1-wave)*.55:0;});
+    petals.forEach((petal,k)=>{petal.userData.solid.emissiveIntensity=.35+Math.max(0,Math.sin(t*.9-k*.35))*1.5;petal.scale.setScalar(.65+Math.max(0,phase-.25));});
   };
 }
 
-/* 05 XBIT — git graph with travelling commits */
-function buildGit(root, p) {
-  const lanes = [-.3, 0, .3]; const nodes = []; const lines = [];
-  const commits = [[0,1],[1,1],[2,0],[3,1],[3,2],[4,0],[5,1],[6,2],[7,1]]; // [x-step, lane]
-  const pos = commits.map(([s, l]) => new THREE.Vector3(-.6 + s * .17, lanes[l], 0));
-  const links = [[0,1],[1,2],[1,3],[3,4],[2,5],[5,6],[3,6],[4,7],[6,8],[7,8]];
-  pos.forEach((P, k) => { const m = new THREE.Mesh(new THREE.SphereGeometry(.04, 12, 12), M(0xb7a6ff, { emissive:0x6f5be0, emissiveIntensity:.5 })); m.position.copy(P); root.add(track(m)); nodes.push(m); });
-  links.forEach(([a, b]) => { const g = new THREE.BufferGeometry().setFromPoints([pos[a], pos[b]]); const l = new THREE.Line(g, new THREE.LineBasicMaterial({ color:0x8c7bff, transparent:true, opacity:.7 })); root.add(l); lines.push(l); });
-  const panel = new THREE.Mesh(new THREE.BoxGeometry(1.25, .78, .03), M(0x0e1526, { emissive:0x1b2540, emissiveIntensity:.5, roughness:.3 })); panel.position.z = -.12; root.add(track(panel));
-  const pulses = [new THREE.CatmullRomCurve3([pos[0], pos[1], pos[3], pos[4], pos[7], pos[8]]), new THREE.CatmullRomCurve3([pos[1], pos[2], pos[5], pos[6], pos[8]])].map(c => {
-    const m = new THREE.Mesh(new THREE.SphereGeometry(.05, 10, 10), new THREE.MeshBasicMaterial({ color:0xffffff })); root.add(track(m, { noEdges:true })); return { c, m }; });
-  const file = new THREE.Mesh(new THREE.BoxGeometry(.18, .22, .02), M(0xffffff, { emissive:0xffffff, emissiveIntensity:.4 })); file.position.set(-.85, .45, .1); root.add(track(file));
-  return (t, dt, playing) => {
-    pulses.forEach((p, k) => { const u = (t * .16 + k * .5) % 1; p.m.position.copy(p.c.getPointAt(u)); p.m.visible = playing; });
-    nodes.forEach((n, k) => { const near = pulses.some(p => p.m.position.distanceTo(n.position) < .09); n.userData.solid.emissiveIntensity = THREE.MathUtils.lerp(n.userData.solid.emissiveIntensity, near ? 2.2 : .5, .2); });
-    file.position.y = .45 + Math.sin(t * 1.6) * .03; file.rotation.z = Math.sin(t * .8) * .08;
-  };
-}
-
-const BUILD = { aquarium:buildAquarium, body:buildBody, store:buildStore, trading:buildTrading, git:buildGit };
+const BUILD = { aquarium:buildAquarium, body:buildBody, store:buildStore, moonGarden:buildMoonGarden };
 PROJECTS.forEach((p, i) => makeCube(p, LAYOUT[i], BUILD[p.builder], i));
 
 /* ---------- postprocessing ---------- */
@@ -301,8 +309,8 @@ window.addEventListener('ojh:project-closed', exitCube);
 function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
   renderer.setSize(w, h, false); composer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
-  const narrow = w < 700; useBloom = !narrow; bloom.enabled = useBloom;
-  world.position.x = narrow ? 0 : 1.65; camHome.z = narrow ? 11.5 : 9.2; camHome.x = narrow ? 0 : 0.35;
+  const narrow = w < 960; useBloom = !narrow; bloom.enabled = useBloom;
+  world.position.x = narrow ? 0 : 1.65; camHome.z = narrow ? (w < 700 ? 11.5 : 7.8) : 9.2; camHome.x = narrow ? 0 : 0.35;
   if (state.focus < 0 && state.camT >= 1) camera.position.copy(camHome);
   camera.fov = narrow ? 44 : 38; camera.updateProjectionMatrix();
 }
