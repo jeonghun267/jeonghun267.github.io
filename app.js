@@ -156,7 +156,8 @@
       if (card) openProject(card.dataset.projectId, card);
     });
     const sceneLinks = query('#scene-project-list');
-    config.projects.forEach(project => {
+    // 3D 씬에 큐브가 있는 프로젝트만 씬 바로가기로 보여 준다 (inScene: false는 카드 목록에만)
+    config.projects.filter(project => project.inScene !== false).forEach(project => {
       const link = makeElement('button', 'scene-project-link', project.number + ' · ' + project.title);
       link.type = 'button'; link.dataset.projectId = project.id;
       link.setAttribute('aria-haspopup', 'dialog');
