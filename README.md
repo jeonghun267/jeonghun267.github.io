@@ -56,7 +56,7 @@ npm run check
 python tests/smoke_test.py
 ```
 
-브라우저 검사에는 Playwright와 Chromium이 필요합니다(`CHROMIUM_PATH`로 경로 지정 가능). 결과는 [design-qa.md](design-qa.md)에 기록합니다.
+브라우저 검사에는 Playwright와 Chromium이 필요합니다(`CHROMIUM_PATH`로 경로 지정 가능). 결과는 [docs/design-qa.md](docs/design-qa.md)에 기록합니다.
 
 ## 구조
 
