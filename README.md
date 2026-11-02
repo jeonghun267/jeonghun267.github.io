@@ -52,3 +52,8 @@ python tests/smoke_test.py
 GitHub Pages는 `main` 브랜치의 루트를 제공합니다. 미디어는 로컬 파일로 호스팅하고, AAC YouTube 시연만 네트워크 연결이 필요합니다. 영상은 자동 재생하지 않으며 상세 창을 닫으면 재생을 정지합니다.
 
 API 키·토큰·Notion의 임시 서명 주소를 코드에 저장하지 않습니다. 이미지·영상 출처와 콘텐츠 범위는 [SOURCES.md](SOURCES.md), 외부 코드 라이선스는 [NOTICE.md](NOTICE.md)에 있습니다.
+
+## 개발 흐름
+
+- `jeonghun` 브랜치에서 작업하고, 빌드·실행으로 에러가 없는지 확인한 뒤 `main`에 머지합니다.
+- `main`은 항상 실행 가능한 상태로 유지합니다.
