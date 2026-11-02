@@ -237,7 +237,8 @@
       renderProjectEvidence(project);
       const tags = query('#dialog-tags'); tags.replaceChildren(...project.tags.map(tag => makeElement('span', '', tag)));
       const points = query('#dialog-points'); points.replaceChildren(...project.points.map(point => makeElement('li', '', point)));
-      assignLink(query('#dialog-notion'), project.notion);
+      const notion = query('#dialog-notion'); notion.hidden = !project.notion;
+      if (project.notion) assignLink(notion, project.notion); else notion.removeAttribute('href');
       const video = query('#dialog-video'); video.hidden = !project.video;
       if (project.video) assignLink(video, project.video); else video.removeAttribute('href');
       const source = query('#dialog-github'); source.hidden = !project.github;

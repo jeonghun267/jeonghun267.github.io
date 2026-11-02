@@ -6,7 +6,7 @@ window.PORTFOLIO_CONFIG = Object.freeze({
   "email": "popmin07@gmail.com",
   "github": "https://github.com/jeonghun267",
   "notion": "https://app.notion.com/p/59a8e7bb577082fabbf381ca689df946",
-  "contentDate": "2026-10-13",
+  "contentDate": "2026-11-02",
   "projects": [
     {
       "id": "aac",
@@ -93,8 +93,9 @@ window.PORTFOLIO_CONFIG = Object.freeze({
           "caption": "연습 시간·학습 지표·어려웠던 발음을 확인하고 다시 연습으로 이어집니다. 리포트 화면·기록 집계·AI 피드백 연결을 담당했습니다."
         }
       ],
-      "note": "현재 말하기 훈련 시나리오는 편의점입니다. 현장모드는 사진 인식·장소 검색과 문장 전달을 지원하며, 공간에 매장을 배치하는 AR 기능으로 소개하지 않습니다. 소스 저장소는 비공개이며 상세 구현은 Notion에서 확인할 수 있습니다.",
+      "note": "현재 말하기 훈련 시나리오는 편의점입니다. 현장모드는 사진 인식·장소 검색과 문장 전달을 지원하며, 공간에 매장을 배치하는 AR 기능으로 소개하지 않습니다. 소스 코드는 GitHub, 상세 구현 기록은 Notion에서 확인할 수 있습니다.",
       "notion": "https://app.notion.com/p/3678e7bb5770836ebaa8811cda4984c2",
+      "github": "https://github.com/jeonghun267/AAC_ARTTI",
       "video": "https://youtu.be/1W3cxmKj3GI",
       "youtubeEmbed": "https://www.youtube-nocookie.com/embed/1W3cxmKj3GI",
       "videoCaption": "AAC 시연 — 화면 이동, 대화 훈련, 점원 음성·립싱크와 학습 리포트"
@@ -213,6 +214,41 @@ window.PORTFOLIO_CONFIG = Object.freeze({
         "poster": "assets/media/lightofkorea-cover.png",
         "caption": "달빛의 한국 오프닝 시연 · 약 50초"
       }
+    },
+    {
+      "id": "relo",
+      "number": "05",
+      "title": "ReLo · 해외 직구 환불 기록",
+      "subtitle": "반품·교환·환불을 접수부터 회수까지 한곳에서 관리하는 웹 서비스",
+      "category": "WEB · AI",
+      "filters": [
+        "web",
+        "ai"
+      ],
+      "art": "assets/media/relo-cover.png",
+      "imageAlt": "ReLo 첫 화면 — 해외직구 환불 안내 문구와 신청 버튼",
+      "artLabel": "웹 · 로컬 실행 화면",
+      "type": "2인 협업 · 웹",
+      "status": "웹 핵심 기능 구현 · 배포 전",
+      "tags": [
+        "React 19",
+        "TypeScript",
+        "Vite",
+        "Tailwind CSS",
+        "Node.js",
+        "SQLite",
+        "Gemini"
+      ],
+      "description": "아마존·알리익스프레스 같은 해외 쇼핑몰에서 산 물건의 반품·교환·환불을 접수부터 판매처 문의, 진행 추적, 회수 확인까지 소비자 한 사람이 관리하는 B2C 웹 서비스입니다.",
+      "role": "서비스 설계, Node.js 백엔드(계층형 구조·SQLite·인증·이메일), React 19 프론트엔드, Gemini 연동",
+      "points": [
+        "주문 정보 → 문제 → 증빙 → 요청 → 확인의 5단계 클레임 신청",
+        "Gemini 문서 읽기·영문 문의 초안·번역·답변 분석, 동의한 사용자만 쓰고 결과는 미리보기",
+        "통화별 미회수 금액 현황판, 진행 단계·회수율과 해야 할 일",
+        "회원가입·이메일 인증, 한국어·영어·중국어·일본어 전환, 모바일 우선 반응형"
+      ],
+      "note": "웹은 핵심 기능까지 구현했고 아직 배포 전이며, 모바일 앱은 시작하지 않았습니다. 계좌번호 저장·환불금 대신 받기·판매처에 메일 보내기는 법·보안 위험 때문에 일부러 하지 않습니다. 화면은 로컬 실행 캡처입니다.",
+      "github": "https://github.com/jeonghun267/Agent_ReLo"
     }
   ]
 });
