@@ -1,11 +1,5 @@
-# Third-party notices
+# 외부 코드 고지
 
-The SVG icons in `assets/icons/` are from Font Awesome Free, by Fonticons, Inc.
-The installed distribution's complete license is included as `assets/icons/LICENSE.txt`.
-Font Awesome Free SVG icons are licensed under CC BY 4.0. The files were recolored to match this portfolio.
-Source: https://fontawesome.com/
+`vendor/three.module.js`는 three.js r170이며 MIT 라이선스입니다. 전문은 `vendor/LICENSE.three.txt`에 있습니다.
 
-three.js (r170) and its postprocessing examples in `vendor/` are MIT licensed; see `vendor/LICENSE.three.txt`.
-
-No font binaries or webfont files are distributed in this project.
-The decorative raster assets were extracted from the approved images in this conversation, not from a third-party portfolio website.
+글꼴 파일과 아이콘 파일은 배포하지 않습니다. 화면의 3D 요소는 모두 코드로 만든 도형입니다.

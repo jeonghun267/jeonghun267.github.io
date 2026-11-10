@@ -1,11 +1,11 @@
 {
-  "name": "ojh-orbit-portfolio",
-  "version": "1.0.0",
+  "name": "jeonghun267-portfolio",
+  "version": "2.0.0",
   "private": true,
-  "description": "An offline-capable, responsive orbital portfolio for OJH",
+  "description": "오정훈 포트폴리오 — 한 화면에서 가상 공간을 오가는 사이트",
   "scripts": {
     "dev": "node server.mjs",
-    "check": "node --check app.js && node --check config.js && node --check hero3d.js"
+    "check": "node --check app.js && node --check config.js"
   },
   "engines": { "node": ">=18.18.0" }
 }
