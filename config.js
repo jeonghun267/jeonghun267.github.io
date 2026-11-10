@@ -1,255 +1,120 @@
-/* Portfolio snapshot — current Unity / Unreal work. Public links and local media only. */
+/* 포트폴리오 내용. 문구·링크·자료는 여기서만 고친다. 공개 링크와 저장소 안 파일만 쓴다. */
 'use strict';
 window.PORTFOLIO_CONFIG = Object.freeze({
-  "name": "오정훈",
-  "initials": "OJH",
-  "email": "popmin07@gmail.com",
-  "github": "https://github.com/jeonghun267",
-  "notion": "https://app.notion.com/p/59a8e7bb577082fabbf381ca689df946",
-  "contentDate": "2026-11-02",
-  "projects": [
+  name: '오정훈',
+  email: 'popmin07@gmail.com',
+  github: 'https://github.com/jeonghun267',
+  contentDate: '2026-11-10',
+  intro: {
+    hello: '안녕하세요, 오정훈입니다',
+    headline: '직접 들어가서 겪는<br><em>가상 공간</em>을 만듭니다',
+    paragraphs: [
+      'Unity와 C#으로 VR 체험과 AI 대화 앱을 만듭니다. 보고 끝나는 화면보다, 걸어 들어가 관찰하고 말을 걸 수 있는 콘텐츠에 관심이 있습니다.',
+      '여기 있는 세 공간은 제가 만든 프로젝트입니다.'
+    ],
+    facts: [
+      ['소속', '한국폴리텍대학 인천캠퍼스 컴퓨터공학과 · 2027.02 졸업 예정'],
+      ['하는 일', 'XR 상호작용 · AI 대화 연동 · 3D 캐릭터와 UI'],
+      ['도구', 'Unity 6 · C# · Meta Quest · Gemini · Blender']
+    ]
+  },
+  projects: [
     {
-      "id": "aac",
-      "number": "01",
-      "title": "아르띠 · Unity AAC",
-      "subtitle": "일상 의사소통을 연습하고, 현장에서 표현을 돕는 앱",
-      "category": "대표 졸업작품 · UNITY · AI",
-      "filters": [
-        "unity",
-        "ai"
+      id: 'still',
+      number: '01',
+      title: 'STILL',
+      short: '해변에서 1,000m 심해까지, 관찰하고 기록하는 VR',
+      subtitle: '해변의 해양 관측소에서 출발해 24m · 200m · 1,000m를 내려가며 해양생물을 관찰하고 기록하는 VR',
+      meta: '개인 프로젝트 · Meta Quest · 2026.08 – 2026.11',
+      stack: 'Unity 6.3 · C# · URP · OpenXR · XR Interaction Toolkit · Gemini · HLSL · Blender',
+      cover: 'assets/media/still-reef24.jpg',
+      mood: 'sea',
+      description: '지구 표면의 71%는 바다지만, 그 바다의 80% 이상은 아직 아무도 본 적이 없습니다. STILL은 생물을 잡아 모으는 대신 모르는 바다를 한 칸씩 기록하는 관찰 체험입니다. 10~15세 관람객을 기준으로 글자 크기와 단어, UI 배치를 맞췄습니다.',
+      role: '씬 빌더, 해변·로비 연출과 NPC 대화, 층별 하강과 엔딩, 보이드 시뮬레이션, 수조·심해 셰이더, 관찰기와 XR 입력, Gemini 설명과 음성 해설, 관찰 일지, Quest 최적화까지 혼자 설계하고 구현했습니다.',
+      points: [
+        '해변 조수 웅덩이에서 첫 기록을 남기고, 보리 선장과 놀란을 만난 뒤 엘리베이터로 24m 산호초 · 200m 박광층 · 1,000m 심해를 차례로 내려갑니다.',
+        '헤엄치는 생물을 손으로 겨누고 지켜보면 기록됩니다. Gemini가 만든 한국어 설명과 음성 해설이 나오고, 110종 관찰 일지가 채워집니다.',
+        '1,000m에서는 조명을 끄고 가만히 있어야 다가오는 ‘신호의 주인’을 처음 기록해 이름을 붙입니다. 크레딧 뒤에는 ‘오늘 밤의 이야기’ 다섯 장면이 이어집니다.',
+        '해변을 걷는 동안 보이지 않는 수중 돔이 물고기 142마리와 렌더러 299개를 계속 돌리고 있었습니다. 물 위에서는 돔을 통째로 끄고, 처음 내려갈 때 검은 화면 뒤에서 켭니다.',
+        'Quest에서 추가 조명을 켜는 대신 심해 전용 셰이더가 조명을 직접 계산합니다. 고정 포비에이티드 렌더링과 동시 물고기 150마리 예산으로 프레임을 지켰습니다.'
       ],
-      "featured": true,
-      "art": "assets/media/aac-cover.png",
-      "imageAlt": "아르띠 AAC 시작 화면 — 편의점 공간과 ARTTI 로고",
-      "artLabel": "프로젝트 대표 화면",
-      "type": "3인 협업 · Android 태블릿",
-      "status": "졸업작품 · 2026.04–2026.10",
-      "tags": [
-        "Unity",
-        "C#",
-        "UI/UX",
-        "Blender",
-        "Meshy",
-        "Gemini",
-        "STT · TTS",
-        "uLipSync"
+      note: '사진은 에디터 플레이로 찍은 장면입니다. 본편과 밤의 이야기 다섯 장면까지 완성했고, Quest 실기기에서 전체 흐름을 한 번에 확인하는 일이 남아 있습니다.',
+      media: [
+        { type: 'image', label: '해변', src: 'assets/media/still-beach.jpg', caption: '해변에서 본 관측소 — 벽 전체 벽화와 지붕 간판, 테라스로 오르는 나무 계단' },
+        { type: 'image', label: '로비', src: 'assets/media/still-lobby.jpg', caption: '로비 홀 — 바시스피어 전시 · 개찰구 · 데이터 월' },
+        { type: 'image', label: '24m', src: 'assets/media/still-reef24.jpg', caption: '24m 산호초 — 바다거북 · 돌고래 · 상어와 산호초 물고기' },
+        { type: 'image', label: '200m', src: 'assets/media/still-200m.jpg', caption: '200m 박광층 — 가끔 돔 가까이 지나가는 대왕고래' },
+        { type: 'image', label: '밤', src: 'assets/media/still-night.jpg', caption: '밤의 관측소 — 달과 등대 빛줄기가 비치는 밤바다' }
       ],
-      "description": "편의점 말하기 훈련과 실제 장소의 의사소통을 지원하는 Unity 기반 AI·AAC 앱입니다. 음성·카드·키보드 입력, AI 점원의 응답, 사용자별 기록과 학습 리포트를 하나의 흐름으로 연결했습니다.",
-      "role": "훈련 흐름·UX 설계, 전체 UI 디자인과 Unity 구현, 훈련·프로필·리포트 개발, AI·STT·TTS 연동, Meshy 모델의 Blender 보정과 리깅·UV·머티리얼·표정·립싱크 통합",
-      "points": [
-        "편의점 5단계 대화: 인사 → 물건 선택 → 추가 요청 → 결제 → 작별",
-        "훈련지원: 음성·AAC 카드·키보드 입력, 힌트·되묻기·재시도와 AI 점원",
-        "현장지원: 사진 OCR·장소 검색·지도, 문장 카드·카페 주문과 음성 전달",
-        "사용자별 프로필·음성 설정, 학습 기록·기간별 리포트와 발음 비교 듣기"
-      ],
-      "summary": [
-        [
-          "내 역할",
-          "Unity·C# 기반 훈련 흐름과 UX를 설계하고 앱 전체 UI 디자인과 화면 구현을 담당했습니다."
-        ],
-        [
-          "내 역할",
-          "편의점 대화 훈련, 프로필·학습 기록·리포트를 개발하고 Gemini·STT·TTS를 연결했습니다."
-        ],
-        [
-          "3D 작업",
-          "Meshy 모델을 Blender에서 보정하며 뼈대·스키닝·UV·머티리얼·셰이프키를 수정하고 애니메이션·립싱크를 통합했습니다."
-        ],
-        [
-          "AI 활용",
-          "Gemini로 점원 대화·학습 피드백을 생성하고, Meshy로 3D 캐릭터 원본 모델을 제작했습니다."
-        ],
-        [
-          "개발 보조 AI",
-          "Claude Code와 Unity 에디터 연동 도구로 코드 작성과 에디터 작업을 보조받았습니다."
-        ],
-        [
-          "어려웠던 문제",
-          "FBX 크기·팔 자세가 어긋나고 표정 스크립트가 입 모양을 동시에 제어했습니다."
-        ],
-        [
-          "해결",
-          "FBX 계층을 보존하고 남자 점원을 Generic 리그로 임포트해 크기와 뼈 회전 문제를 해결했습니다."
-        ],
-        [
-          "해결",
-          "입 모양 제어를 한 드라이버로 모으고 점원·카드 음성을 분리해 TTS 립싱크와 무음 시 입 닫기를 연결했습니다."
-        ]
-      ],
-      "screens": [
-        {
-          "src": "assets/media/AAC_training_screen.jpg",
-          "title": "01 · 훈련지원",
-          "caption": "음성·카드·키보드로 편의점 이용을 연습하고 AI 점원의 응답과 힌트를 확인합니다. 훈련 UI/UX·대화 흐름·캐릭터와 립싱크를 구현했습니다."
-        },
-        {
-          "src": "assets/media/AAC_field_screen.jpg",
-          "title": "02 · 현장지원",
-          "caption": "촬영 이미지·장소·지도를 확인하고 도움 카드와 주문 문장을 음성으로 전달합니다. 현장 화면의 UI/UX와 디자인을 담당했습니다."
-        },
-        {
-          "src": "assets/media/AAC_report_screen.jpg",
-          "title": "03 · 학습 리포트",
-          "caption": "연습 시간·학습 지표·어려웠던 발음을 확인하고 다시 연습으로 이어집니다. 리포트 화면·기록 집계·AI 피드백 연결을 담당했습니다."
-        }
-      ],
-      "note": "현재 말하기 훈련 시나리오는 편의점입니다. 현장모드는 사진 인식·장소 검색과 문장 전달을 지원하며, 공간에 매장을 배치하는 AR 기능으로 소개하지 않습니다. 소스 코드는 GitHub, 상세 구현 기록은 Notion에서 확인할 수 있습니다.",
-      "notion": "https://app.notion.com/p/3678e7bb5770836ebaa8811cda4984c2",
-      "github": "https://github.com/jeonghun267/AAC_ARTTI",
-      "video": "https://youtu.be/1W3cxmKj3GI",
-      "youtubeEmbed": "https://www.youtube-nocookie.com/embed/1W3cxmKj3GI",
-      "videoCaption": "AAC 시연 — 화면 이동, 대화 훈련, 점원 음성·립싱크와 학습 리포트"
+      links: [
+        ['전체 영상', 'https://youtu.be/65kSSI_hgK0'],
+        ['GitHub', 'https://github.com/jeonghun267/STILL']
+      ]
     },
     {
-      "id": "humanbody",
-      "number": "02",
-      "title": "인체탐험 VR",
-      "subtitle": "소화기관을 따라 이동하는 VR 교육 콘텐츠",
-      "category": "UNITY · XR · MEDIA",
-      "filters": [
-        "unity"
+      id: 'aac',
+      number: '02',
+      title: '아르띠',
+      short: '편의점 대화를 연습하는 AI · AAC 앱',
+      subtitle: '편의점 대화를 미리 연습하고, 실제 가게에서는 대신 말해 주는 AI · AAC 앱',
+      meta: '3인 팀 졸업작품 · Android 태블릿 · 2026.05 – 진행 중',
+      stack: 'Unity 6.3 · C# · Gemini 2.5 Flash · STT/TTS · uLipSync · Blender',
+      cover: 'assets/media/aac-cover.png',
+      mood: 'store',
+      description: '발달장애인이 동네 가게에서 스스로 말할 수 있도록 돕는 앱입니다. 특수학교 교사와 복지관 담당자 인터뷰에서 나온 ‘실제와 비슷한 반복 연습’과 ‘현장에서 바로 쓰는 보조 수단’을 한 앱의 두 모드로 만들었습니다.',
+      role: '훈련 모드 전체, 앱 전체 UI/UX 디자인과 구현, 프로필·음성 설정, 리포트, 3D 점원 캐릭터를 맡았습니다.',
+      points: [
+        '3D 편의점에서 점원과 인사 → 물건 고르기 → 추가 요청 → 계산 → 인사까지 실제 순서대로 대화합니다.',
+        'Gemini가 다음 단계를 제안해도 그대로 믿지 않습니다. 없는 단계는 무시하고, 지난 단계로 돌아가거나 건너뛰는 것을 막습니다.',
+        '정해진 문장과 상품 선택은 규칙으로 바로 처리하고, 규칙에 없는 말만 LLM에 보내 응답 속도를 확보했습니다.',
+        '서버 음성 인식이 끊기면 Android 기본 음성 인식으로 자동 전환해 훈련이 멈추지 않습니다.',
+        'Meshy로 만든 점원 모델을 Blender에서 리깅·UV·셰이프 키까지 보정하고 립싱크를 붙였습니다.'
       ],
-      "art": "assets/media/humanbody-cover.png",
-      "imageAlt": "인체탐험 위 씬 — 보트와 가이드 NPC",
-      "artLabel": "위 씬 · 실제 화면",
-      "type": "개인 프로젝트",
-      "status": "실사화 개선 진행 중",
-      "tags": [
-        "Unity",
-        "C#",
-        "Meta XR SDK",
-        "Cinemachine",
-        "OSC · NDI"
+      note: '말하기 훈련 시나리오는 현재 편의점 하나입니다. 현장 모드의 기능 구현은 팀원 담당이고, 저는 그 화면의 UI/UX를 맡았습니다.',
+      media: [
+        { type: 'image', label: '시작 화면', src: 'assets/media/aac-cover.png', caption: '아르띠 시작 화면' },
+        { type: 'image', label: '훈련', src: 'assets/media/AAC_training_screen.jpg', caption: '말하기 훈련 — 음성·카드·키보드로 점원과 대화하고 힌트를 받습니다' },
+        { type: 'image', label: '현장', src: 'assets/media/AAC_field_screen.jpg', caption: '현장 지원 — 장소에 맞는 카드를 눌러 음성으로 전달합니다' },
+        { type: 'image', label: '리포트', src: 'assets/media/AAC_report_screen.jpg', caption: '학습 리포트 — 연습 시간과 어려웠던 발음을 확인합니다' }
       ],
-      "description": "소화기관 내부를 이동하며 기관별 설명을 듣는 Unity VR 교육 콘텐츠입니다. 보트·가이드 NPC·음성 안내·씬 전환과 OSC 입력·NDI 영상 송출을 하나의 체험 흐름으로 구성했습니다.",
-      "role": "VR 환경, 다중 씬 전환·플레이어 위치 보정, 보트 탑승·하차, NPC·음성 안내·VFX와 OSC/NDI 연동을 개인으로 설계·구현",
-      "points": [
-        "입/식도 → 위 → 소장 → 마무리의 4개 씬 체험",
-        "Spline 보트 이동·탑승·하차, 가이드 NPC와 위치 기반 음성 안내",
-        "씬 전환 시 CharacterController 제어와 SpawnPoint 재배치, 페이드·비동기 로딩",
-        "OSC A/B 입력 송수신과 RenderTexture 기반 NDI 영상 송출"
-      ],
-      "note": "기존 VR 구현을 바탕으로 실사화 개선을 진행 중입니다. 영상은 NDI 연동을 촬영한 현장 시연이며, 기존 구현 버전의 자료입니다.",
-      "notion": "https://app.notion.com/p/04f8e7bb5770828e9d6481d3dac5d137",
-      "github": "https://github.com/jeonghun267/HUMANBODY",
-      "clip": {
-        "src": "assets/media/humanbody-ndi.mp4",
-        "poster": "assets/media/humanbody-cover.png",
-        "caption": "NDI 연동 현장 시연 · 전체 1분 2.5초"
-      }
+      links: [
+        ['시연 영상', 'https://youtu.be/1W3cxmKj3GI'],
+        ['GitHub', 'https://github.com/jeonghun267/AAC_ARTTI']
+      ]
     },
     {
-      "id": "still",
-      "number": "03",
-      "title": "STILL",
-      "subtitle": "해양생물을 관찰·기록하는 Meta Quest VR 도감",
-      "category": "UNITY · XR · AI",
-      "filters": [
-        "unity",
-        "ai"
+      id: 'humanbody',
+      number: '03',
+      title: '인체탐험 VR',
+      short: '치료 잠수정을 타고 몸속으로, 아픈 곳을 직접 고치는 VR',
+      subtitle: '환자를 진찰하고, 초소형 치료 잠수정을 타고 입에서 대장까지 들어가 아픈 곳을 직접 고치는 VR 교육 체험',
+      meta: '개인 프로젝트 · Meta Quest 2/3 · 2026.05 – 진행 중',
+      stack: 'Unity 6 · C# · URP · Meta XR SDK · OSC · NDI',
+      cover: 'assets/media/hb-intestine-3.jpg',
+      mood: 'body',
+      description: '소화기관을 그림으로 외우는 대신, 안에 들어가 보고 · 겨누고 · 고치며 배우도록 만들었습니다. 체험관 어린이 관람객이 대상이라 대사는 아이 눈높이 말투로 쓰고, 앉아서 하는 체험과 왼손잡이 설정을 지원합니다.',
+      role: '여정 진행과 임무, 병원 NPC 대화, 겨누기와 표적, 화면 표시 규칙, 이동과 멀미 줄이기, 몸속 표현, 소리, 체험관 운영 기능, Quest 최적화까지 혼자 설계하고 구현했습니다.',
+      points: [
+        '진료실에서 홀로그램 몸의 빨간 점 세 곳(이 · 위 · 대장)을 겨눠 진찰하면 출발 버튼이 열리고, 잠수정이 입으로 들어갑니다.',
+        '기관마다 치료 임무가 있습니다. 입의 충치와 치태 세균, 식도의 역류 위산, 위의 헬리코박터균, 소장의 효소 짝 맞추기, 대장의 해로운 균.',
+        '마지막 진료실에서 치료 결과 모니터와 OX 퀴즈, 치료 보고서로 배운 내용을 정리합니다.',
+        '순간이동 대신 걷기와 부드러운 회전, 가장자리 비네트로 멀미를 줄였습니다.',
+        '세균 모형의 삼각형을 UV를 지키며 줄여 대장 장면을 96만에서 53만으로 낮추고, 융털 5만여 개는 눈앞 11m 구간만 그립니다.'
       ],
-      "art": "assets/media/still-info.jpg",
-      "imageAlt": "STILL Quest 실기기 화면 — 해양생물 설명 패널",
-      "artLabel": "Meta Quest · 실기기 캡처",
-      "type": "개인 프로젝트",
-      "status": "콘텐츠 추가 진행 중",
-      "tags": [
-        "Unity",
-        "C#",
-        "OpenXR · XRI",
-        "Gemini · TTS",
-        "HLSL"
+      note: '사진은 2026년 11월 에디터 플레이 화면입니다. 영상은 리뉴얼 전 버전(병아리 의사 · 보트)으로, 헤드셋 화면을 NDI로 옆 PC에 띄우는 모습을 보여 주려고 남겼습니다. 지금 버전의 전체 영상은 헤드셋 확인 뒤에 넣을 예정입니다.',
+      media: [
+        { type: 'image', label: '진료실', src: 'assets/media/hb-clinic.jpg', caption: '병원 진료실 — 홀로그램 몸, 진찰 모니터, 잠수정 탑승구, 의사 선생님' },
+        { type: 'image', label: '입', src: 'assets/media/hb-mouth-2.jpg', caption: '입 — 양치를 안 하면 생기는 충치' },
+        { type: 'image', label: '위', src: 'assets/media/hb-stomach-3.jpg', caption: '위 — 위액 위를 떠다니는 헬리코박터균 물리치기' },
+        { type: 'image', label: '소장', src: 'assets/media/hb-intestine-1.jpg', caption: '소장 — 융털과 혈관 속 적혈구' },
+        { type: 'image', label: '대장', src: 'assets/media/hb-intestine-3.jpg', caption: '대장 — 해로운 균 물리치기' },
+        { type: 'image', label: '결과', src: 'assets/media/hb-ending-2.jpg', caption: '마지막 진료실 — 치료 결과 모니터' },
+        { type: 'video', label: 'NDI 영상', src: 'assets/media/humanbody-ndi-15s.mp4', poster: 'assets/media/hb-clinic.jpg', caption: 'NDI 실시간 송출 · 15초 · 리뉴얼 전 버전' }
       ],
-      "description": "육상 해양 관측소 로비에서 출발해 엘리베이터로 수중 돔에 내려가고, 24m·200m·1,000m 층을 차례로 탐사하며 해양생물을 관찰하는 Meta Quest VR 콘텐츠입니다. 관찰기로 생물을 겨눠 기록하면 한국어 설명과 음성 해설이 나오고, 탐험가별 관찰 일지에 쌓입니다.",
-      "role": "보이드 시뮬레이션·수조 셰이더·XR 입력·Gemini 설명과 TTS·관찰 기록·오디오·씬 빌더를 개인으로 설계·구현",
-      "points": [
-        "보이드 군집과 몇 분마다 바뀌는 산호초 무리, 수조 내벽·수중 효과 셰이더",
-        "관찰기로 생물을 겨눠 기록, 텔레포트·막대 걷기와 부드러운 회전",
-        "육지 로비 → 엘리베이터 → 24m·200m·1,000m 층별 하강, '가만히' 조우와 밤 로비 엔딩",
-        "Gemini 설명·TTS와 캐시·실패 시 대체 처리, 탐험가별 관찰 일지·360° 미리보기"
-      ],
-      "note": "영상과 이미지는 기존 수중 체험의 실기기 자료라, 로비·층별 하강·엔딩처럼 최근 추가한 연출은 담겨 있지 않습니다. 소스 저장소는 비공개이며, 상세 구현은 Notion에서 확인할 수 있습니다.",
-      "notion": "https://app.notion.com/p/3d48e7bb577081f4bd06ff765a08f616",
-      "clip": {
-        "src": "assets/media/still-highlight.mp4",
-        "poster": "assets/media/still-fish.jpg",
-        "caption": "Meta Quest 실기기 하이라이트 · 31초"
-      }
-    },
-    {
-      "id": "lightofkorea",
-      "number": "04",
-      "title": "LightOfKorea",
-      "subtitle": "달항아리·한옥·빛의 숲을 잇는 Unreal 미디어아트",
-      "category": "UNREAL · MEDIA ART",
-      "filters": [
-        "unreal",
-        "ai"
-      ],
-      "art": "assets/media/lightofkorea-cover.png",
-      "imageAlt": "LightOfKorea 대표사진 — 달항아리·한옥과 반사 바닥",
-      "artLabel": "Unreal · 프로토타입 화면",
-      "type": "개인 학습 프로젝트",
-      "status": "ZONE 01 · 60초 프로토타입",
-      "tags": [
-        "Unreal Engine",
-        "Sequencer",
-        "Niagara",
-        "Python",
-        "HLSL"
-      ],
-      "description": "‘빛의 대한민국: 달빛에서 네온까지’의 첫 공간 ‘달빛의 한국’을 구성한 60초 오프닝 프로토타입입니다. 달항아리의 윤곽·유약·먹 매화 문양이 드러나고 바닥의 파동이 나무·한옥·입자의 빛으로 이어집니다.",
-      "role": "공간 구도·절차적 메시·재질·조명·카메라·파티클 구성과 보정, Unreal Python 제작·검사·렌더 자동화, AI 생성 텍스처 통합",
-      "points": [
-        "달항아리·곡선 나무·한옥, 반사 바닥과 낮은 안개로 공간 구성",
-        "AI 생성 유약·먹 매화 텍스처의 색·거칠기·미세 노멀과 윤곽 발광",
-        "Sequencer·MPC를 이용한 단계별 등장과 거리 기반 빛 파동",
-        "Niagara 4종, 꽃잎 인스턴스, 재실행 중복 검사·재생 확인·MRQ 출력"
-      ],
-      "note": "현재 구현은 ZONE 01의 자동 재생과 공간 연출입니다. 센서·관람객 입력, ZONE 2–5와 현장 nDisplay/DMX 구성은 후속 범위입니다. 업로드 영상은 오프닝을 약 50초로 담은 시연입니다.",
-      "notion": "https://app.notion.com/p/3f88e7bb5770817a9a90f414b4314c68",
-      "github": "https://github.com/jeonghun267/LightOfKorea",
-      "clip": {
-        "src": "assets/media/lightofkorea-opening.mp4",
-        "poster": "assets/media/lightofkorea-cover.png",
-        "caption": "달빛의 한국 오프닝 시연 · 약 50초"
-      }
-    },
-    {
-      "id": "relo",
-      "number": "05",
-      "title": "ReLo · 해외 직구 환불 기록",
-      "subtitle": "반품·교환·환불을 접수부터 회수까지 한곳에서 관리하는 웹 서비스",
-      "category": "WEB · AI",
-      "filters": [
-        "web",
-        "ai"
-      ],
-      "inScene": false,
-      "art": "assets/media/relo-cover.png",
-      "imageAlt": "ReLo 첫 화면 — 해외직구 환불 안내 문구와 신청 버튼",
-      "artLabel": "웹 · 로컬 실행 화면",
-      "type": "2인 협업 · 웹",
-      "status": "웹 핵심 기능 구현 · 배포 전",
-      "tags": [
-        "React 19",
-        "TypeScript",
-        "Vite",
-        "Tailwind CSS",
-        "Node.js",
-        "SQLite",
-        "Gemini"
-      ],
-      "description": "아마존·알리익스프레스 같은 해외 쇼핑몰에서 산 물건의 반품·교환·환불을 접수부터 판매처 문의, 진행 추적, 회수 확인까지 소비자 한 사람이 관리하는 B2C 웹 서비스입니다.",
-      "role": "서비스 설계, Node.js 백엔드(계층형 구조·SQLite·인증·이메일), React 19 프론트엔드, Gemini 연동",
-      "points": [
-        "주문 정보 → 문제 → 증빙 → 요청 → 확인의 5단계 클레임 신청",
-        "Gemini 문서 읽기·영문 문의 초안·번역·답변 분석, 동의한 사용자만 쓰고 결과는 미리보기",
-        "통화별 미회수 금액 현황판, 진행 단계·회수율과 해야 할 일",
-        "회원가입·이메일 인증, 한국어·영어·중국어·일본어 전환, 모바일 우선 반응형"
-      ],
-      "note": "웹은 핵심 기능까지 구현했고 아직 배포 전이며, 모바일 앱은 시작하지 않았습니다. 계좌번호 저장·환불금 대신 받기·판매처에 메일 보내기는 법·보안 위험 때문에 일부러 하지 않습니다. 화면은 로컬 실행 캡처입니다.",
-      "github": "https://github.com/jeonghun267/Agent_ReLo"
+      links: [
+        ['예전 버전 영상', 'https://www.youtube.com/watch?v=oTahLEX3NXo'],
+        ['GitHub', 'https://github.com/jeonghun267/HUMANBODY']
+      ]
     }
   ]
 });
