@@ -78,7 +78,7 @@ window.PORTFOLIO_CONFIG = Object.freeze({
         { type: 'image', label: '리포트', src: 'assets/media/AAC_report_screen.jpg', caption: '학습 리포트 — 연습 시간과 어려웠던 발음을 확인합니다' }
       ],
       links: [
-        ['시연 영상', 'https://youtu.be/1W3cxmKj3GI'],
+        ['시연 영상', 'https://youtu.be/mxhzmhs_olc'],
         ['GitHub', 'https://github.com/jeonghun267/AAC_ARTTI']
       ]
     },
@@ -112,7 +112,6 @@ window.PORTFOLIO_CONFIG = Object.freeze({
         { type: 'video', label: 'NDI 영상', src: 'assets/media/humanbody-ndi-15s.mp4', poster: 'assets/media/hb-clinic.jpg', caption: 'NDI 실시간 송출 · 15초 · 리뉴얼 전 버전' }
       ],
       links: [
-        ['예전 버전 영상', 'https://www.youtube.com/watch?v=oTahLEX3NXo'],
         ['GitHub', 'https://github.com/jeonghun267/HUMANBODY']
       ]
     }
